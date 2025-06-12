@@ -35,3 +35,5 @@ out/
 
 ### VS Code ###
 .vscode/
+#Pour ignorer le fichier contenant les infos de la base de donnèes
+src/main/resources/application-local.properties
