@@ -18,6 +18,9 @@ import Publications from "./pages/Publications";
 import Revues from "./pages/Revues";
 import Stages from "./pages/Stages";
 import AjouterEtudiant from "./pages/AjouterEtudiant";
+import AdminPage from './pages/AdminPage';
+import ChercheurPage from './pages/ChercheurPage';
+
 
 
 function App() {
@@ -50,6 +53,8 @@ function App() {
             <Route path="/revues" element={<Revues />} />
             <Route path="/stages" element={<Stages />} />
             <Route path="/AjouterEtudiant" element={<AjouterEtudiant />} />
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/chercheur" element={<ChercheurPage />} />
           </Routes>
         </div>
 

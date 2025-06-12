@@ -10,7 +10,7 @@ const AjouterEtudiant = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch("http://localhost:8080/etudiants", {
+    fetch("http://localhost:8081/etudiants", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(etudiant),

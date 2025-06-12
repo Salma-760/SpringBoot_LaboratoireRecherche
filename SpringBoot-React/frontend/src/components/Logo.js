@@ -9,6 +9,10 @@ const Logo = () => {
     const [index, setIndex] = useState(0);
     const intervalRef = useRef(null);
 
+    // Champs de formulaire
+    const [email, setEmail] = useState("");
+    const [motPasse, setMotPasse] = useState("");
+
     useEffect(() => {
         if (isDeleting) {
             if (index > 0) {
@@ -38,7 +42,6 @@ const Logo = () => {
         return () => clearTimeout(intervalRef.current);
     }, [index, isDeleting, title]);
 
-    // Fonction pour colorer la première lettre de chaque mot
     const formatTitle = (text) => {
         return text.split(" ").map((word, i) => (
             <span key={i}>
@@ -48,26 +51,59 @@ const Logo = () => {
         ));
     };
 
+    const handleLogin = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await fetch("http://localhost:8081/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, motPasse }),
+            });
+
+            if (!response.ok) {
+                alert("Échec de la connexion. Vérifiez vos identifiants.");
+                return;
+            }
+
+            const data = await response.json();
+
+            // Stocker le token
+            localStorage.setItem("token", data.token);
+
+            // Redirection selon le rôle
+            if (data.role === "ADMIN") {
+                window.location.href = "/admin";
+            } else if (data.role === "CHERCHEUR") {
+                window.location.href = "/chercheur";
+            } else {
+                alert("Rôle non reconnu.");
+            }
+
+        } catch (error) {
+            console.error("Erreur:", error);
+            alert("Erreur de connexion au serveur.");
+        }
+    };
+
     return (
         <div className="relative w-full h-[40vh]">
-            {/* Image en arrière-plan */}
             <img
                 src="/images/Ensaf.jpg"
                 alt="Ensaf"
                 className="w-full h-full object-cover"
             />
 
-            {/* Calque sombre pour améliorer la lisibilité du texte */}
             <div className="absolute inset-0 bg-black bg-opacity-50"></div>
 
-            {/* Titre centré sur l'image */}
             <div className="absolute inset-0 flex justify-center items-center">
                 <h1 className="text-4xl font-bold text-white text-center">
                     {formatTitle(displayTitle)}
                 </h1>
             </div>
 
-            {/* Bouton "Se Connecter" en haut à droite */}
             <div className="absolute top-4 right-4">
                 <button
                     onClick={() => setShowLoginForm(!showLoginForm)}
@@ -77,7 +113,6 @@ const Logo = () => {
                 </button>
             </div>
 
-            {/* Formulaire de connexion */}
             {showLoginForm && (
                 <div
                     className="absolute top-16 right-4 bg-white p-6 rounded-lg shadow-lg w-80 z-20"
@@ -85,14 +120,17 @@ const Logo = () => {
                     onMouseLeave={() => setIsHovered(false)}
                 >
                     <h2 className="text-xl font-bold text-center mb-4">Connexion</h2>
-                    <form>
+                    <form onSubmit={handleLogin}>
                         <div className="mb-4">
                             <label className="block text-gray-700 text-sm font-bold mb-2">
-                                Nom d'utilisateur
+                                Nom d'utilisateur (Email)
                             </label>
                             <input
                                 type="text"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                required
                             />
                         </div>
                         <div className="mb-6">
@@ -101,7 +139,10 @@ const Logo = () => {
                             </label>
                             <input
                                 type="password"
+                                value={motPasse}
+                                onChange={(e) => setMotPasse(e.target.value)}
                                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                required
                             />
                         </div>
                         <button
