@@ -1,0 +1,5 @@
+com\example\demo\repository\EtudiantRepository.class
+com\example\demo\controller\EtudiantController.class
+com\example\demo\service\EtudiantService.class
+com\example\demo\PfaProjectApplication.class
+com\example\demo\model\Etudiant.class
