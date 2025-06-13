@@ -11,6 +11,7 @@
     <name>demo</name>
     <description>Demo project for Spring Boot</description>
 
+    <!-- Spring Boot Parent -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -18,78 +19,94 @@
         <relativePath/>
     </parent>
 
+    <!-- Java Version -->
     <properties>
         <java.version>17</java.version>
     </properties>
 
+    <!-- Dépendances -->
     <dependencies>
-        <!-- Web -->
+
+        <!-- ========== SPRING BOOT - WEB ========== -->
+        <!-- Pour créer des applications RESTful -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Security -->
+        <!-- ========== SPRING SECURITY ========== -->
+        <!-- Authentification, autorisation, sécurité HTTP -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+
+        <!-- Pour encoder/décoder les mots de passe -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
         </dependency>
 
-        <!-- JPA -->
+        <!-- ========== PERSISTANCE / BASE DE DONNÉES ========== -->
+        <!-- Spring Data JPA pour l'accès aux données avec ORM -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <!-- MySQL -->
+        <!-- Driver JDBC pour MySQL -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.33</version>
         </dependency>
 
-        <!-- Devtools -->
-
-        <!-- Test -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- JWT -->
+        <!-- ========== JWT (JSON Web Token) ========== -->
+        <!-- API pour créer/valider les JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
             <version>0.11.5</version>
         </dependency>
+
+        <!-- Implémentation de l’API JWT (runtime) -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-impl</artifactId>
             <version>0.11.5</version>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- Utilisation de Jackson pour sérialisation/désérialisation dans JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
             <version>0.11.5</version>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- ========== OUTILS DE DÉVELOPPEMENT ========== -->
+        <!-- Génération automatique des getters/setters, constructeurs, etc. -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- ========== TESTS ========== -->
+        <!-- Dépendances de test (JUnit, Mockito, etc.) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
+    <!-- Plugins de compilation -->
     <build>
         <plugins>
+            <!-- Plugin pour compiler avec Java 17 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

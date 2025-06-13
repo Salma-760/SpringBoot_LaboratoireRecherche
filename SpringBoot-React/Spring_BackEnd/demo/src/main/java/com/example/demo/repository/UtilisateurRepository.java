@@ -9,6 +9,6 @@ import com.example.demo.model.Utilisateur;
 
 @Repository
 public interface UtilisateurRepository extends JpaRepository<Utilisateur, Integer> {
-    Optional<Utilisateur> findByEmail(String email);
+    Utilisateur findByEmail(String email);
 }
 

@@ -1,8 +1,13 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+// Import des composants de la structure de la page
 import Navbar from "./components/NavBar";
 import Logo from "./components/Logo";
 import Footer from "./components/Footer";
+import ProtectedRoute from './components/ProtectedRoute'; // Import de la route protégée
+
+// Import des pages publiques
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Actualites from "./pages/Actualités";
@@ -18,26 +23,28 @@ import Publications from "./pages/Publications";
 import Revues from "./pages/Revues";
 import Stages from "./pages/Stages";
 import AjouterEtudiant from "./pages/AjouterEtudiant";
+
+// Import des pages protégées
 import AdminPage from './pages/AdminPage';
 import ChercheurPage from './pages/ChercheurPage';
-
-
 
 function App() {
   return (
     <Router>
       <div className="flex flex-col min-h-screen">
-        {/* Affichage du Logo */}
+        {/* Le composant Logo contient la logique de connexion */}
         <Logo />
 
-        {/* Navbar collée au Logo */}
+        {/* La barre de navigation */}
         <div className="relative z-10">
           <Navbar />
         </div>
 
-        {/* Contenu principal avec flex-grow pour remplir l'espace */}
-        <div className="flex-grow">
+        {/* Le contenu principal de la page */}
+        <main className="flex-grow">
           <Routes>
+            {/* --- Routes Publiques --- */}
+            {/* Tout le monde peut accéder à ces pages */}
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/actualites" element={<Actualites />} />
@@ -53,12 +60,36 @@ function App() {
             <Route path="/revues" element={<Revues />} />
             <Route path="/stages" element={<Stages />} />
             <Route path="/AjouterEtudiant" element={<AjouterEtudiant />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/chercheur" element={<ChercheurPage />} />
-          </Routes>
-        </div>
 
-        {/* Footer toujours en bas */}
+            {/* --- Routes Protégées --- */}
+            {/* Seuls les utilisateurs avec les bons rôles peuvent accéder à ces pages */}
+
+            {/* Route pour la page Admin */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <AdminPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Route pour la page Chercheur */}
+            <Route
+              path="/chercheur"
+              element={
+                <ProtectedRoute allowedRoles={['CHERCHEUR', 'ADMIN']}>
+                  <ChercheurPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Vous pouvez ajouter une page "Non autorisé" ou une page 404 si vous le souhaitez */}
+            {/* <Route path="*" element={<NotFoundPage />} /> */}
+          </Routes>
+        </main>
+
+        {/* Le pied de page */}
         <Footer />
       </div>
     </Router>
