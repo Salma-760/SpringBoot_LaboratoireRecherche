@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { jwtDecode } from "jwt-decode"; // Assurez-vous d'avoir installé jwt-decode
+import { jwtDecode } from "jwt-decode";
 
 const Logo = () => {
     // --- États pour l'UI et l'animation ---
@@ -113,7 +113,7 @@ const Logo = () => {
 
     // --- Rendu du composant ---
     return (
-        <div className="relative w-full h-[40vh]">
+        <div className="relative w-full h-[35vh]">
             <img
                 src="/images/Ensaf.jpg"
                 alt="Ensaf"

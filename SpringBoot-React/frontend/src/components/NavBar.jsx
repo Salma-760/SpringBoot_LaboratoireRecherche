@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { FaHome } from "react-icons/fa";
 
 const menuItems = {
   "Actualités": [
-    { name: "Tous les événements", link: "/pages/Evenements" },
-    { name: "Toutes les actualités", link: "/pages/Actualités" },
+    { name: "Toutes les actualités", link: "/Actualites" },
+    { name: "Tous les événements", link: "/Evenements" },
   ],
   "Présentation": [
     { name: "Notre équipe", link: "/pages/Equipe" },
@@ -37,37 +39,43 @@ const menuColors = {
   "Emplois": "bg-[#3C8DC9]",
 };
 
+
 export default function Barre() {
   const [activeMenu, setActiveMenu] = useState(null);
   const [timeoutId, setTimeoutId] = useState(null);
 
-  // Fonction pour ouvrir un menu et réinitialiser le timer
+  // ... (vos fonctions handleMouseEnter et handleClick restent inchangées)
   const handleMouseEnter = (item) => {
     setActiveMenu(item);
-
-    // Annule le timer précédent si la souris revient
     if (timeoutId) clearTimeout(timeoutId);
-
-    // Lance un nouveau timer pour masquer le menu après 20 secondes
-    const id = setTimeout(() => {
-      setActiveMenu(null);
-    }, 20000);
-
+    const id = setTimeout(() => { setActiveMenu(null); }, 20000);
     setTimeoutId(id);
   };
 
-  // Fonction pour fermer le menu immédiatement
   const handleClick = (item) => {
     setActiveMenu(activeMenu === item ? null : item);
     if (timeoutId) clearTimeout(timeoutId);
   };
 
-  return (
-   <div>
-    <nav div className="relative w-full bg-gray-800 shadow-lg p-4">
 
-      
-        <ul className="flex justify-center space-x-8 text-lg font-semibold text-white relative">
+  return (
+    <div>
+      <nav className="relative w-full bg-gray-800 shadow-lg p-4">
+
+        {/* `items-center` pour un meilleur alignement vertical */}
+        <ul className="flex justify-center items-center space-x-8 text-lg font-semibold text-white relative">
+          <li className="flex-shrink-0">
+            <Link
+              to="/"
+              className="text-gray-300 hover:text-white transition-colors"
+              aria-label="Page d'accueil"
+              onClick={() => {
+                if (activeMenu) setActiveMenu(null);
+              }}
+            >
+              <FaHome size={22} />
+            </Link>
+          </li>
           {Object.keys(menuItems).map((item) => (
             <li
               key={item}
@@ -75,10 +83,10 @@ export default function Barre() {
               onMouseEnter={() => handleMouseEnter(item)}
               onClick={() => handleClick(item)}
             >
+
               {/* Ligne statique en bas */}
               <div
-                className={`absolute bottom-0 left-0 w-full h-1 transition-all duration-300 ${activeMenu === item ? "opacity-0" : "bg-gray-400"
-                  }`}
+                className={`absolute bottom-0 left-0 w-full h-1 transition-all duration-300 ${activeMenu === item ? "opacity-0" : "bg-gray-400"}`}
               ></div>
 
               {/* Élément principal cliquable */}
@@ -94,8 +102,9 @@ export default function Barre() {
               {/* Liste déroulante */}
               {activeMenu === item && (
                 <ul className="absolute left-0 mt-2 w-48 bg-white border border-gray-300 shadow-lg rounded-md overflow-hidden z-10">
-                  {menuItems[item].map(({ name, link }) => (
-                    <li key={name} className="hover:bg-gray-200">
+                  {menuItems[item].map(({ name, link }, index) => (
+                    <li key={`${name}-${index}`} className="hover:bg-gray-200">
+
                       <a
                         href={link}
                         className="block px-4 py-2 text-gray-800 hover:text-gray-900"

@@ -1,0 +1,16 @@
+[
+  {
+    "titre": "Lancement du projet 'SmartCity Fès'",
+    "chapeau": "Notre laboratoire est fier d'annoncer sa participation au projet innovant SmartCity, visant à moderniser les infrastructures urbaines grâce à l'IA.",
+    "contenu": "Le projet 'SmartCity Fès' est une collaboration majeure entre l'université, les autorités locales et des partenaires industriels. Nos équipes se concentreront sur les aspects de la mobilité intelligente et de la gestion énergétique. Plus de détails seront publiés prochainement.",
+    "datePublication": "2024-05-15T10:00:00Z",
+    "imageUrl": "/images/actualites/smartcity.jpg"
+  },
+  {
+    "titre": "Publication majeure dans 'IEEE Transactions'",
+    "chapeau": "L'équipe de recherche en traitement d'images a publié un article révolutionnaire sur la détection d'anomalies dans les images médicales.",
+    "contenu": "L'article, intitulé 'Deep Anomaly Detection in Medical Imaging using Self-Supervised Learning', a été accepté dans la prestigieuse revue IEEE Transactions on Medical Imaging. Il présente une nouvelle méthode qui surpasse les approches existantes de 15% en précision.",
+    "datePublication": "2024-04-28T14:30:00Z",
+    "imageUrl": "/images/actualites/publication.jpg"
+  }
+]
