@@ -8,8 +8,8 @@ const menuItems = {
     { name: "Tous les événements", link: "/Evenements" },
   ],
   "Présentation": [
-    { name: "Notre équipe", link: "/pages/Equipe" },
-    { name: "Notre mission", link: "/pages/Missions" },
+    { name: "Notre équipe", link: "/Equipe" },
+    { name: "Notre mission", link: "/Missions" },
   ],
   "Recherche": [
     { name: "Projets", link: "/pages/Projets" },
@@ -44,7 +44,6 @@ export default function Barre() {
   const [activeMenu, setActiveMenu] = useState(null);
   const [timeoutId, setTimeoutId] = useState(null);
 
-  // ... (vos fonctions handleMouseEnter et handleClick restent inchangées)
   const handleMouseEnter = (item) => {
     setActiveMenu(item);
     if (timeoutId) clearTimeout(timeoutId);

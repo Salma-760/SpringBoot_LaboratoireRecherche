@@ -97,9 +97,6 @@ function App() {
             </ProtectedRoute>
           }
         >
-          {/* Route admin ici */}
-          {/* Exemple: <Route index element={<AdminDashboard />} /> */}
-          {/* Exemple: <Route path="users" element={<ManageUsers />} /> */}
         </Route>
 
       </Routes>
