@@ -1,18 +1,39 @@
 import React, { useState, useEffect } from "react";
 
+const baseIndexationOptions = [
+  { value: "Scopus", label: "Scopus" },
+  { value: "dblp", label: "DBLP" },
+  { value: "WOS", label: "WOS" },
+  { value: "WebOfScience", label: "Web of Science" },
+];
+
 const ModifierPublication = ({ publication, auteursDisponibles, onCancel, onSave }) => {
-  const [form, setForm] = useState({ ...publication, auteurs: publication.auteurs.map(a => a.id) });
+  const [form, setForm] = useState({
+    ...publication,
+    auteurs: publication.auteurs ? publication.auteurs.map(a => a.id) : [],
+    baseIndexation: publication.baseIndexation || [],
+  });
 
   useEffect(() => {
-    setForm({ ...publication, auteurs: publication.auteurs.map(a => a.id) });
+    setForm({
+      ...publication,
+      auteurs: publication.auteurs ? publication.auteurs.map(a => a.id) : [],
+      baseIndexation: publication.baseIndexation || [],
+    });
   }, [publication]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Pour select multiple baseIndexation
+  const handleBaseIndexationChange = (e) => {
+    const selected = Array.from(e.target.selectedOptions).map(opt => opt.value);
+    setForm({ ...form, baseIndexation: selected });
+  };
+
   const handleAuteursChange = (e) => {
-    const selectedIds = [...e.target.selectedOptions].map(option => parseInt(option.value));
+    const selectedIds = Array.from(e.target.selectedOptions).map(opt => parseInt(opt.value));
     setForm({ ...form, auteurs: selectedIds });
   };
 
@@ -21,7 +42,8 @@ const ModifierPublication = ({ publication, auteursDisponibles, onCancel, onSave
 
     const updatedPublication = {
       ...form,
-      auteurs: form.auteurs.map(id => ({ id }))
+      auteurs: form.auteurs.map(id => ({ id })),
+      // baseIndexation est déjà un tableau prêt à être envoyé
     };
 
     fetch(`http://localhost:8081/publications/${form.id}`, {
@@ -33,16 +55,15 @@ const ModifierPublication = ({ publication, auteursDisponibles, onCancel, onSave
         if (!res.ok) throw new Error("Erreur lors de la mise à jour");
         return res.json();
       })
-      .then(data => {
-        onSave(data);
-      })
+      .then(data => onSave(data))
       .catch(err => alert(err.message));
   };
 
   return (
     <div className="bg-white p-4 rounded shadow max-w-xl mx-auto mb-6">
-      <h3 className="text-xl font-bold mb-3">Modifier la publication </h3>
+      <h3 className="text-xl font-bold mb-3">Modifier la publication</h3>
       <form onSubmit={handleSubmit} className="space-y-3">
+
         <input
           type="text"
           name="titre"
@@ -60,19 +81,28 @@ const ModifierPublication = ({ publication, auteursDisponibles, onCancel, onSave
           onChange={handleChange}
           className="w-full p-2 border rounded"
         />
-        <input
-          type="text"
-          name="base_indexation"
-          placeholder="Base d'indexation"
-          value={form.base_indexation || ""}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
+
+        {/* Select multiple baseIndexation */}
+        <label className="block font-semibold">Base d'indexation</label>
+        <select
+          multiple
+          name="baseIndexation"
+          value={form.baseIndexation}
+          onChange={handleBaseIndexationChange}
+          className="w-full border rounded p-2"
+        >
+          {baseIndexationOptions.map(opt => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+
         <input
           type="number"
-          name="annee_publication"
+          name="annee"
           placeholder="Année publication"
-          value={form.annee_publication || ""}
+          value={form.annee || ""}
           onChange={handleChange}
           className="w-full p-2 border rounded"
         />
@@ -116,8 +146,12 @@ const ModifierPublication = ({ publication, auteursDisponibles, onCancel, onSave
         </select>
 
         <div className="flex gap-3 justify-end mt-4">
-          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Enregistrer</button>
-          <button type="button" onClick={onCancel} className="bg-gray-400 text-white px-4 py-2 rounded">Annuler</button>
+          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+            Enregistrer
+          </button>
+          <button type="button" onClick={onCancel} className="bg-gray-400 text-white px-4 py-2 rounded">
+            Annuler
+          </button>
         </div>
       </form>
     </div>

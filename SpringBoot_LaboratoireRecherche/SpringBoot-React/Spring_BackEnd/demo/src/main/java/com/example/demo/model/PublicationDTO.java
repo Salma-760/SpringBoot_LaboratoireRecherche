@@ -1,24 +1,20 @@
 package com.example.demo.model;
 
-
-
 import java.util.Set;
 
 public class PublicationDTO {
     private Long id;
     private String titre;
     private String journal;
-    private String baseIndexation;
-    private int anneePublication;
+    private Set<String> baseIndexation;  // camelCase
+    private Integer annee;
     private int volume;
     private int pages;
     private String doi;
-
     private Set<AuteurDTO> auteurs;
 
     public PublicationDTO() {}
 
-    // Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -28,11 +24,11 @@ public class PublicationDTO {
     public String getJournal() { return journal; }
     public void setJournal(String journal) { this.journal = journal; }
 
-    public String getBaseIndexation() { return baseIndexation; }
-    public void setBaseIndexation(String baseIndexation) { this.baseIndexation = baseIndexation; }
+    public Set<String> getBaseIndexation() { return baseIndexation; }
+    public void setBaseIndexation(Set<String> baseIndexation) { this.baseIndexation = baseIndexation; }
 
-    public int getAnneePublication() { return anneePublication; }
-    public void setAnneePublication(int anneePublication) { this.anneePublication = anneePublication; }
+    public Integer getAnnee() { return annee; }
+    public void setAnnee(int annee) { this.annee = annee; }
 
     public int getVolume() { return volume; }
     public void setVolume(int volume) { this.volume = volume; }
