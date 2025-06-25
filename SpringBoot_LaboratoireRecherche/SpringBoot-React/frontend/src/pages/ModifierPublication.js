@@ -1,122 +1,124 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 
-const ModifierPublication = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-
-  const [publication, setPublication] = useState({
-    titre: "", journal: "", base_indexation: "",
-    annee_publication: "", volume: "", pages: "",
-    doi: "", auteurs: []
-  });
-
-  const [auteursList, setAuteursList] = useState([]);
+const ModifierPublication = ({ publication, auteursDisponibles, onCancel, onSave }) => {
+  const [form, setForm] = useState({ ...publication, auteurs: publication.auteurs.map(a => a.id) });
 
   useEffect(() => {
-    // Charger la publication
-    fetch(`http://localhost:8081/publications/${id}`)
-      .then(res => {
-        if (!res.ok) throw new Error("Erreur backend");
-        return res.json();
-      })
-      .then(data => {
-        setPublication({
-          ...data,
-          auteurs: Array.isArray(data.auteurs) ? data.auteurs.map(a => ({ id: a.id })) : []
-        });
-      })
-      .catch(err => {
-        console.error("Erreur de chargement publication:", err);
-      });
-
-    // Charger les auteurs
-    fetch("http://localhost:8081/auteurs")
-      .then(res => {
-        if (!res.ok) throw new Error("Erreur backend");
-        return res.json();
-      })
-      .then(data => {
-        setAuteursList(Array.isArray(data) ? data : []);
-      })
-      .catch(err => {
-        console.error("Erreur de chargement auteurs:", err);
-      });
-  }, [id]);
+    setForm({ ...publication, auteurs: publication.auteurs.map(a => a.id) });
+  }, [publication]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setPublication({ ...publication, [name]: value });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleAuteurSelect = (e) => {
-    const selectedIds = Array.from(e.target.selectedOptions, option => ({ id: parseInt(option.value) }));
-    setPublication({ ...publication, auteurs: selectedIds });
+  const handleAuteursChange = (e) => {
+    const selectedIds = [...e.target.selectedOptions].map(option => parseInt(option.value));
+    setForm({ ...form, auteurs: selectedIds });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch(`http://localhost:8080/publications/${id}`, {
+
+    const updatedPublication = {
+      ...form,
+      auteurs: form.auteurs.map(id => ({ id }))
+    };
+
+    fetch(`http://localhost:8081/publications/${form.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(publication)
+      body: JSON.stringify(updatedPublication),
     })
       .then(res => {
-        if (!res.ok) throw new Error("Erreur backend PUT");
-        alert("Publication modifiée !");
-        navigate("/");
+        if (!res.ok) throw new Error("Erreur lors de la mise à jour");
+        return res.json();
       })
-      .catch(err => {
-        console.error("Erreur modification:", err);
-      });
+      .then(data => {
+        onSave(data);
+      })
+      .catch(err => alert(err.message));
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-50 flex items-center justify-center py-12 px-6">
-      <form onSubmit={handleSubmit} className="bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] p-10 w-full max-w-4xl animate-fade-in space-y-5">
-        <h2 className="text-4xl font-black text-center text-blue-700 mb-6">Modifier une publication</h2>
+    <div className="bg-white p-4 rounded shadow max-w-xl mx-auto mb-6">
+      <h3 className="text-xl font-bold mb-3">Modifier la publication </h3>
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <input
+          type="text"
+          name="titre"
+          placeholder="Titre"
+          value={form.titre || ""}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+          required
+        />
+        <input
+          type="text"
+          name="journal"
+          placeholder="Journal"
+          value={form.journal || ""}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+        />
+        <input
+          type="text"
+          name="base_indexation"
+          placeholder="Base d'indexation"
+          value={form.base_indexation || ""}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+        />
+        <input
+          type="number"
+          name="annee_publication"
+          placeholder="Année publication"
+          value={form.annee_publication || ""}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+        />
+        <input
+          type="number"
+          name="volume"
+          placeholder="Volume"
+          value={form.volume || ""}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+        />
+        <input
+          type="number"
+          name="pages"
+          placeholder="Pages"
+          value={form.pages || ""}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+        />
+        <input
+          type="text"
+          name="doi"
+          placeholder="DOI"
+          value={form.doi || ""}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+        />
 
-        {[{ name: "titre", placeholder: "Titre" },
-          { name: "journal", placeholder: "Journal" },
-          { name: "base_indexation", placeholder: "Base d'indexation" },
-          { name: "annee_publication", placeholder: "Année", type: "number" },
-          { name: "volume", placeholder: "Volume", type: "number" },
-          { name: "pages", placeholder: "Pages", type: "number" },
-          { name: "doi", placeholder: "DOI" }].map(({ name, placeholder, type = "text" }) => (
-            <div key={name}>
-              <label className="text-sm font-bold text-gray-700 mb-1 block capitalize">{placeholder}</label>
-              <input
-                type={type}
-                name={name}
-                value={publication[name]}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-blue-300 rounded-xl shadow-md focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white/50"
-              />
-            </div>
-        ))}
-
-        <div>
-          <label className="text-sm font-bold text-gray-700 mb-1 block">Auteurs :</label>
-          <select
-            multiple
-            value={publication.auteurs.map(a => a.id)}
-            onChange={handleAuteurSelect}
-            className="w-full px-4 py-3 border border-blue-300 rounded-xl shadow-md focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white/50"
-          >
-            {auteursList.map(a => (
-              <option key={a.id} value={a.id}>Nom: {a.nom} Prenom: {a.prenom} Email:{a.email}</option>
-            ))}
-          </select>
-        </div>
-
-        <button
-          type="submit"
-          className="w-full py-4 text-white text-lg bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500 rounded-2xl transition duration-300 font-extrabold shadow-xl tracking-wide"
+        <label className="block font-semibold">Auteurs</label>
+        <select
+          multiple
+          value={form.auteurs || []}
+          onChange={handleAuteursChange}
+          className="w-full border rounded p-2"
         >
-          ✏️ Modifier
-        </button>
+          {auteursDisponibles.map(a => (
+            <option key={a.id} value={a.id}>
+              {a.nom} {a.prenom}
+            </option>
+          ))}
+        </select>
+
+        <div className="flex gap-3 justify-end mt-4">
+          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Enregistrer</button>
+          <button type="button" onClick={onCancel} className="bg-gray-400 text-white px-4 py-2 rounded">Annuler</button>
+        </div>
       </form>
     </div>
   );

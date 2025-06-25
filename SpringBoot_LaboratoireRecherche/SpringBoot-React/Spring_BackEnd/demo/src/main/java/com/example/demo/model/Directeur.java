@@ -1,6 +1,8 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+
+import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -19,40 +21,45 @@ public class Directeur {
     private String prenom;
 
     @ManyToMany(mappedBy = "directeurs")
-    @JsonIgnore 
-    private Set<These> theses;
+    @JsonIgnore
+    private Set<These> theses = new HashSet<>();
 
     public Directeur() {}
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public String getNom() {
-		return nom;
-	}
+    public String getNom() {
+        return nom;
+    }
 
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
 
-	public String getPrenom() {
-		return prenom;
-	}
+    public String getPrenom() {
+        return prenom;
+    }
 
-	public void setPrenom(String prenom) {
-		this.prenom = prenom;
-	}
-	
-	
+    public void setPrenom(String prenom) {
+        this.prenom = prenom;
+    }
 
-	public void setTheses(Set<These> theses) {
-		this.theses = theses;
-	}
+    public Set<These> getTheses() {
+        return theses;
+    }
 
-   
+    public void setTheses(Set<These> theses) {
+        this.theses = theses;
+    }
+
+    @Override
+    public String toString() {
+        return "Directeur{id=" + id + ", nom='" + nom + "', prenom='" + prenom + "'}";
+    }
 }

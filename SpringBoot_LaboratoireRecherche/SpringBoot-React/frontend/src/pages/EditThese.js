@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 
 const EditThese = ({ these, onTheseUpdated, onCancel }) => {
-  const [form, setForm] = useState({ ...these });
+  // On initialise form avec un objet plat, on met directeurs sous forme de tableau d'IDs
+  const [form, setForm] = useState({
+    ...these,
+    directeurs: these.directeurs ? these.directeurs.map((d) => d.id.toString()) : [],
+  });
   const [directeurs, setDirecteurs] = useState([]);
 
   useEffect(() => {
@@ -10,6 +14,14 @@ const EditThese = ({ these, onTheseUpdated, onCancel }) => {
       .then((data) => setDirecteurs(data))
       .catch((err) => console.error("Erreur chargement directeurs:", err));
   }, []);
+
+  // Au cas où la prop "these" change, on synchronise form.directeurs
+  useEffect(() => {
+    setForm({
+      ...these,
+      directeurs: these.directeurs ? these.directeurs.map((d) => d.id.toString()) : [],
+    });
+  }, [these]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -22,12 +34,14 @@ const EditThese = ({ these, onTheseUpdated, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // On reconstruit la liste des directeurs sous forme d'objets {id: x}
     const updatedData = {
       ...form,
       directeurs: form.directeurs.map((id) => ({ id: parseInt(id) })),
     };
 
-    fetch(`http://localhost:8081/${form.id}`, {
+    fetch(`http://localhost:8081/theses/${form.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedData),
@@ -40,6 +54,7 @@ const EditThese = ({ these, onTheseUpdated, onCancel }) => {
     <div className="bg-yellow-50 p-4 rounded shadow-md">
       <h2 className="text-lg font-bold mb-2">Modifier une thèse</h2>
       <form onSubmit={handleSubmit} className="space-y-3">
+        {/* Champs texte */}
         <input
           type="text"
           name="nomDoctorant"
@@ -89,15 +104,16 @@ const EditThese = ({ these, onTheseUpdated, onCancel }) => {
           className="w-full p-2 border rounded"
         />
 
+        {/* Sélecteur multiple des directeurs */}
         <label className="block font-semibold">Directeurs</label>
         <select
           multiple
-          value={form.directeurs || []}
+          value={form.directeurs || []} // tableau d'IDs string
           onChange={handleDirecteurChange}
           className="w-full border px-3 py-2 rounded"
         >
           {directeurs.map((d) => (
-            <option key={d.id} value={d.id}>
+            <option key={d.id} value={d.id.toString()}>
               {d.nom} {d.prenom}
             </option>
           ))}
