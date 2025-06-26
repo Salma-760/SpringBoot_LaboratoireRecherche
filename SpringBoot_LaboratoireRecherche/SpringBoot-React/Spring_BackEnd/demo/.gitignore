@@ -35,5 +35,4 @@ out/
 
 ### VS Code ###
 .vscode/
-###Fichier sensible à ne pas pousser sur GitHub
-src/main/resources/application.properties
+

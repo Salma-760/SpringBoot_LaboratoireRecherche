@@ -1,34 +1,37 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { FaHome } from "react-icons/fa";
 
+// Fusion des menus
 const menuItems = {
   "Actualités": [
-    { name: "Tous les événements", link: "/pages/Evenements" },
-    { name: "Toutes les actualités", link: "/pages/Actualités" },
+    { name: "Toutes les actualités", link: "/actualites" },
+    { name: "Tous les événements", link: "/evenements" },
   ],
   "Présentation": [
-    { name: "Notre équipe", link: "/pages/Equipe" },
-    { name: "Notre mission", link: "/pages/Missions" },
+    { name: "Notre équipe", link: "/equipe" },
+    { name: "Notre mission", link: "/missions" },
   ],
   "Recherche": [
-    { name: "Projets", link: "/pages/Projets" },
-    { name: "Publications", link: "/pages/Publications" },
+    { name: "Projets", link: "/projets" },
+    { name: "Publications", link: "/publications" },
   ],
   "Publications": [
-    { name: "Articles récents", link: "/pages/Articles" },
-    { name: "Revues scientifiques", link: "/pages/Revues" },
+    { name: "Articles récents", link: "/articles" },
+    { name: "Revues scientifiques", link: "/revues" },
   ],
   "Formation": [
-    { name: "Cours en ligne", link: "/pages/Cours" },
-    { name: "Ateliers", link: "/pages/Ateliers" },
-    { name: "Ateliers", link: "/pages/ajouter-etudiant" },
+    { name: "Cours en ligne", link: "/cours" },
+    { name: "Ateliers", link: "/ateliers" },
+    { name: "Ajouter étudiant", link: "/ajouteretudiant" },
   ],
   "Emplois": [
-    { name: "Offres d'emploi", link: "/pages/Offres" },
-    { name: "Stages", link: "/pages/Stages" },
+    { name: "Offres d'emploi", link: "/offres" },
+    { name: "Stages", link: "/stages" },
   ],
-   "Esai": [
-    { name: "Offres d'emploi", link: "/pages/CrudPublication" },
-    { name: "Stages", link: "/pages/ListePublication" },
+  "Esai": [
+    { name: "Crud Publications", link: "/crudpublication" },
+    { name: "Liste Publications", link: "/listepublication" },
   ],
 };
 
@@ -39,39 +42,40 @@ const menuColors = {
   "Publications": "bg-[#5B3D8C]",
   "Formation": "bg-[#F28C10]",
   "Emplois": "bg-[#3C8DC9]",
+  "Esai": "bg-[#8C2E4F]",
 };
 
 export default function Barre() {
   const [activeMenu, setActiveMenu] = useState(null);
   const [timeoutId, setTimeoutId] = useState(null);
 
-  // Fonction pour ouvrir un menu et réinitialiser le timer
   const handleMouseEnter = (item) => {
     setActiveMenu(item);
-
-    // Annule le timer précédent si la souris revient
     if (timeoutId) clearTimeout(timeoutId);
-
-    // Lance un nouveau timer pour masquer le menu après 20 secondes
-    const id = setTimeout(() => {
-      setActiveMenu(null);
-    }, 10);
-
+    const id = setTimeout(() => setActiveMenu(null), 20000);
     setTimeoutId(id);
   };
 
-  // Fonction pour fermer le menu immédiatement
   const handleClick = (item) => {
     setActiveMenu(activeMenu === item ? null : item);
     if (timeoutId) clearTimeout(timeoutId);
   };
 
   return (
-   <div>
-    <nav div className="relative w-full bg-gray-800 shadow-lg p-4">
+    <div>
+      <nav className="relative w-full bg-gray-800 shadow-lg p-4">
+        <ul className="flex justify-center items-center space-x-8 text-lg font-semibold text-white relative">
+          <li className="flex-shrink-0">
+            <Link
+              to="/"
+              className="text-gray-300 hover:text-white transition-colors"
+              aria-label="Accueil"
+              onClick={() => setActiveMenu(null)}
+            >
+              <FaHome size={22} />
+            </Link>
+          </li>
 
-      
-        <ul className="flex justify-center space-x-8 text-lg font-semibold text-white relative">
           {Object.keys(menuItems).map((item) => (
             <li
               key={item}
@@ -79,36 +83,28 @@ export default function Barre() {
               onMouseEnter={() => handleMouseEnter(item)}
               onClick={() => handleClick(item)}
             >
-              {/* Ligne statique en bas */}
               <div
-                className={`absolute bottom-0 left-0 w-full h-1 transition-all duration-300 ${activeMenu === item ? "opacity-0" : "bg-gray-400"
-                  }`}
+                className={`absolute bottom-0 left-0 w-full h-1 transition-all duration-300 ${activeMenu === item ? "opacity-0" : "bg-gray-400"}`}
               ></div>
 
-              {/* Élément principal cliquable */}
               <div className="px-4 py-2 cursor-pointer">{item}</div>
 
-              {/* Ligne dynamique qui apparaît en haut */}
               {activeMenu === item && (
-                <div
-                  className={`absolute top-0 left-0 w-full h-1 transition-all duration-300 ${menuColors[item]}`}
-                ></div>
-              )}
-
-              {/* Liste déroulante */}
-              {activeMenu === item && (
-                <ul className="absolute left-0 mt-2 w-48 bg-white border border-gray-300 shadow-lg rounded-md overflow-hidden z-10">
-                  {menuItems[item].map(({ name, link }) => (
-                    <li key={name} className="hover:bg-gray-200">
-                      <a
-                        href={link}
-                        className="block px-4 py-2 text-gray-800 hover:text-gray-900"
-                      >
-                        {name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
+                <>
+                  <div className={`absolute top-0 left-0 w-full h-1 transition-all duration-300 ${menuColors[item] || "bg-blue-500"}`} />
+                  <ul className="absolute left-0 mt-2 w-56 bg-white border border-gray-300 shadow-lg rounded-md overflow-hidden z-10">
+                    {menuItems[item].map(({ name, link }, index) => (
+                      <li key={`${name}-${index}`} className="hover:bg-gray-200">
+                        <Link
+                          to={link}
+                          className="block px-4 py-2 text-gray-800 hover:text-gray-900"
+                        >
+                          {name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </>
               )}
             </li>
           ))}
