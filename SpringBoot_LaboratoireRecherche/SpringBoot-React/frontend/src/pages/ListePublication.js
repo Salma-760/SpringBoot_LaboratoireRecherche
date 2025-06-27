@@ -79,7 +79,7 @@ const ListePublications = () => {
       <table className="min-w-full table-auto text-left text-base text-gray-700 bg-white rounded shadow-md overflow-hidden">
         <thead className="bg-blue-100 text-blue-700">
           <tr>
-            <th className="px-6 py-3">ID</th>
+           
             <th className="px-6 py-3">Titre</th>
             <th className="px-6 py-3">Journal</th>
             <th className="px-6 py-3">Base_Indexation</th>

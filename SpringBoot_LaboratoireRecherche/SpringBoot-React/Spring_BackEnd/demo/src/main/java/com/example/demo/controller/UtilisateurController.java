@@ -19,8 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UtilisateurController {
 
-    // On utilise maintenant un service pour encapsuler la logique métier
-    private final UtilisateurService utilisateurService; 
+    private final UtilisateurService utilisateurService = new UtilisateurService(); 
 
     @GetMapping("/me")
     public ResponseEntity<UtilisateurDTO> getMonProfil() {

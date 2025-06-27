@@ -26,9 +26,9 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AuthService authService;
+    private final AuthService authService = new AuthService();
     
-    private final JwtFilter jwtFilter; 
+    private final JwtFilter jwtFilter = new JwtFilter(); 
 
     @Bean
     public PasswordEncoder passwordEncoder() {

@@ -15,7 +15,7 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class AuthService implements UserDetailsService {
 
-    private final UtilisateurRepository utilisateurRepository;
+    private final UtilisateurRepository utilisateurRepository = null;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

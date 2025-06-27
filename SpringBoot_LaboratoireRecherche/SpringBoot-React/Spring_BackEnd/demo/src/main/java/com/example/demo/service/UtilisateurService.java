@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UtilisateurService {
 
- private final UtilisateurRepository utilisateurRepository;
+ private final UtilisateurRepository utilisateurRepository = null;
 
  // Méthode pour GET /me
  @Transactional(readOnly = true)

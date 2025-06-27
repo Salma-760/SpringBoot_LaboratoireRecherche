@@ -19,17 +19,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
 
-    private final UtilisateurRepository utilisateurRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
-    private final AuthenticationManager authenticationManager;
+    private final UtilisateurRepository utilisateurRepository = null;
+    private final PasswordEncoder passwordEncoder = null;
+    private final JwtUtil jwtUtil = new JwtUtil();
+    private final AuthenticationManager authenticationManager = null;
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Utilisateur nouvelUtilisateur) {

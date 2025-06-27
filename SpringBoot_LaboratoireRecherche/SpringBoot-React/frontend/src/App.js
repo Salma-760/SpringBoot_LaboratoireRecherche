@@ -1,5 +1,5 @@
 import "./App.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
 import PublicLayout from "./layouts/PublicLayout";
 import ProtectedRoute from './components/ProtectedRoute';
@@ -45,7 +45,7 @@ import ListeTheses from "./pages/ListeTheses";
 import AjouterDirecteur from "./pages/AjouterDirecteur";
 import EditDirecteur from "./pages/EditDirecteur";
 import ListeDirecteurs from "./pages/ListeDirecteurs";
-
+import SideBarAdmin from "./pages/SideBarAdmin";
 // Espace Chercheur
 import DashboardAccueilChercheur from './pages/chercheur/DashboardAccueilChercheur';
 import PublicationsChercheur from './pages/chercheur/PublicationsChercheur';
@@ -56,7 +56,6 @@ function App() {
   return (
     <Router>
       <Routes>
-
         {/* Layout Public */}
         <Route path="/" element={<PublicLayout />}>
           <Route index element={<Home />} />
@@ -99,6 +98,51 @@ function App() {
           <Route path="AjouterDirecteur" element={<AjouterDirecteur />} />
           <Route path="EditDirecteur" element={<EditDirecteur />} />
           <Route path="ListeDirecteurs" element={<ListeDirecteurs />} />
+          <Route path="SideBarAdmin" element={<SideBarAdmin />} />
+        </Route>
+
+        {/* Layout Admin */}
+        <Route
+          path="/admin"
+          element={
+            <AdminPage />
+          }
+        >
+          <Route index element={<Navigate to="publications" />} />
+          {/* Publications */}
+          <Route path="publications" element={<ListePublication />} />
+          <Route path="ajouter-publication" element={<AjouterPublication />} />
+          <Route path="modifier-publication/:id" element={<ModifierPublication />} />
+
+          {/* Auteurs */}
+          <Route path="auteurs" element={<ListeAuteurs />} />
+          <Route path="ajouter-auteur" element={<AjouterAuteur />} />
+          <Route path="modifier-auteur/:id" element={<EditAuteur />} />
+
+          {/* Chercheurs */}
+          <Route path="chercheurs" element={<ListeChercheurs />} />
+          <Route path="ajouter-chercheur" element={<AjouterChercheur />} />
+          <Route path="modifier-chercheur/:id" element={<EditChercheur />} />
+
+          {/* Chapitres */}
+          <Route path="chapitres" element={<ListeChapitres />} />
+          <Route path="ajouter-chapitre" element={<AjouterChapitre />} />
+          <Route path="modifier-chapitre/:id" element={<EditChapitre />} />
+
+          {/* Livres */}
+          <Route path="livres" element={<ListeLivres />} />
+          <Route path="ajouter-livre" element={<AjouterLivre />} />
+          <Route path="modifier-livre/:id" element={<EditLivre />} />
+
+          {/* Thèses */}
+          <Route path="theses" element={<ListeTheses />} />
+          <Route path="ajouter-these" element={<AjouterThese />} />
+          <Route path="modifier-these/:id" element={<EditThese />} />
+
+          {/* Directeurs */}
+          <Route path="directeurs" element={<ListeDirecteurs />} />
+          <Route path="ajouter-directeur" element={<AjouterDirecteur />} />
+          <Route path="modifier-directeur/:id" element={<EditDirecteur />} />
         </Route>
 
         {/* Layout Chercheur */}
@@ -115,17 +159,6 @@ function App() {
           <Route path="ajouter-publication" element={<AjouterPublicationChercheur />} />
           <Route path="profil" element={<ProfilChercheur />} />
         </Route>
-
-        {/* Layout Admin */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute allowedRoles={['ADMIN']}>
-              <AdminPage />
-            </ProtectedRoute>
-          }
-        />
-
       </Routes>
     </Router>
   );
