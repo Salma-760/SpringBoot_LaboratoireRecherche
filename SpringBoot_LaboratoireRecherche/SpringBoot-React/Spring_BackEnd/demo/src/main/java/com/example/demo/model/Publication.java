@@ -27,6 +27,10 @@ public class Publication {
     private int volume;
     private int pages;
     private String doi;
+    
+    
+    @Enumerated(EnumType.STRING)
+    private StatutPublication statut;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -100,6 +104,15 @@ public class Publication {
     }
     public void setAuteurs(Set<Auteur> auteurs) {
         this.auteurs = auteurs;
+    }
+
+
+    public StatutPublication getStatut() {
+        return statut;
+    }
+
+    public void setStatut(StatutPublication statut) {
+        this.statut = statut;
     }
 	
 }

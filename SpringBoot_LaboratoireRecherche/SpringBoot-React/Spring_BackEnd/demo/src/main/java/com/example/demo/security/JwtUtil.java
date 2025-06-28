@@ -72,4 +72,5 @@ public class JwtUtil {
         byte[] keyBytes = secretKey.getBytes();
         return new SecretKeySpec(keyBytes, SignatureAlgorithm.HS256.getJcaName());
     }
+    
 }

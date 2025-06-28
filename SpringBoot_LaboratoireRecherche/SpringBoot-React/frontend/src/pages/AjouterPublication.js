@@ -59,7 +59,7 @@ const AjouterPublication = () => {
       pages: Number(publication.pages) || 0,
     };
     delete dtoToSend.baseIndexations;
-  
+
 
     fetch("http://localhost:8081/publications", {
       method: "POST",
