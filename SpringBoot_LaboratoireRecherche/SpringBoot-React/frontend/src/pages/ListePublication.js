@@ -9,18 +9,34 @@ const ListePublications = () => {
   const [publicationToEdit, setPublicationToEdit] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
 
+  const token = localStorage.getItem("token");
+
   const fetchPublications = () => {
-    fetch("http://localhost:8081/publications")
-      .then(res => res.json())
+    fetch("http://localhost:8081/api/publications", {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then(res => {
+        if (!res.ok) throw new Error("Erreur HTTP " + res.status);
+        return res.json();
+      })
       .then(data => Array.isArray(data) ? setPublications(data) : setPublications([]))
-      .catch(err => console.error("Erreur fetchPublications:", err));
+      .catch(err => console.error("Erreur fetchPublications:", err.message));
   };
 
   const fetchAuteurs = () => {
-    fetch("http://localhost:8081/auteurs")
-      .then(res => res.json())
+    fetch("http://localhost:8081/api/auteurs", {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then(res => {
+        if (!res.ok) throw new Error("Erreur HTTP " + res.status);
+        return res.json();
+      })
       .then(data => Array.isArray(data) ? setAuteurs(data) : setAuteurs([]))
-      .catch(err => console.error("Erreur fetchAuteurs:", err));
+      .catch(err => console.error("Erreur fetchAuteurs:", err.message));
   };
 
   useEffect(() => {
@@ -29,9 +45,14 @@ const ListePublications = () => {
   }, []);
 
   const handleDelete = (id) => {
-    fetch(`http://localhost:8081/publications/${id}`, { method: "DELETE" })
+    fetch(`http://localhost:8081/api/publications/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    })
       .then(() => setPublications(publications.filter(p => p.id !== id)))
-      .catch(err => console.error("Erreur suppression:", err));
+      .catch(err => console.error("Erreur suppression:", err.message));
   };
 
   const handleSave = () => {

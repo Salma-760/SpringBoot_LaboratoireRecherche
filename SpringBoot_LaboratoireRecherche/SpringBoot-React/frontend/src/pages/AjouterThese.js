@@ -15,7 +15,7 @@ const AjouterThese = ({ onTheseAdded, onCancel }) => {
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:8081/directeurs")
+    fetch("http://localhost:8081/api/directeurs")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setDirecteurs(data);
@@ -44,7 +44,7 @@ const AjouterThese = ({ onTheseAdded, onCancel }) => {
       directeurs: form.directeurs.map((id) => ({ id: parseInt(id) })),
     };
 
-    fetch("http://localhost:8081/theses", {
+    fetch("http://localhost:8081/api/theses", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(theseData),

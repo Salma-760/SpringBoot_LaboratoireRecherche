@@ -9,7 +9,7 @@ const EditThese = ({ these, onTheseUpdated, onCancel }) => {
   const [directeurs, setDirecteurs] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8081/directeurs")
+    fetch("http://localhost:8081/api/directeurs")
       .then((res) => res.json())
       .then((data) => setDirecteurs(data))
       .catch((err) => console.error("Erreur chargement directeurs:", err));
@@ -41,7 +41,7 @@ const EditThese = ({ these, onTheseUpdated, onCancel }) => {
       directeurs: form.directeurs.map((id) => ({ id: parseInt(id) })),
     };
 
-    fetch(`http://localhost:8081/theses/${form.id}`, {
+    fetch(`http://localhost:8081/api/theses/${form.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedData),

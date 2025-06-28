@@ -9,7 +9,7 @@ const ListeTheses = () => {
   const [showForm, setShowForm] = useState(false);
 
   const fetchTheses = () => {
-    fetch("http://localhost:8081/theses")
+    fetch("http://localhost:8081/api/theses")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -24,7 +24,7 @@ const ListeTheses = () => {
   }, []);
 
   const handleDelete = (id) => {
-    fetch(`http://localhost:8081/theses/${id}`, { method: "DELETE" })
+    fetch(`http://localhost:8081/api/theses/${id}`, { method: "DELETE" })
       .then(() => fetchTheses())
       .catch((err) => console.error("Erreur suppression :", err));
   };

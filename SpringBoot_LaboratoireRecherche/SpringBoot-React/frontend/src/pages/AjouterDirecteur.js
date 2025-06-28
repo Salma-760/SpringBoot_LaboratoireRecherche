@@ -10,7 +10,7 @@ const AjouterDirecteur = ({ onDirecteurAdded, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch("http://localhost:8081/directeurs", {
+    fetch("http://localhost:8081/api/directeurs", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),

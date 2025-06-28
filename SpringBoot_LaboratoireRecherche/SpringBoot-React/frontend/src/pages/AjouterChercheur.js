@@ -10,7 +10,7 @@ const AjouterChercheur = ({ onChercheurAdded }) => {
     e.preventDefault();
     const chercheur = { nom, prenom, email, specialite };
 
-    fetch("http://localhost:8081/chercheurs", {
+    fetch("http://localhost:8081/api/chercheurs", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(chercheur),

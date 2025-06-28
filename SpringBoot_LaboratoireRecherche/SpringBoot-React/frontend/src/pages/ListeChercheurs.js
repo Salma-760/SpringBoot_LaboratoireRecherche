@@ -8,7 +8,7 @@ const ListeChercheurs = () => {
   const [showFormAjout, setShowFormAjout] = useState(false);
 
   const fetchChercheurs = () => {
-    fetch("http://localhost:8081/chercheurs")
+    fetch("http://localhost:8081/api/chercheurs")
       .then((res) => res.json())
       .then((data) => setChercheurs(data))
       .catch((err) => console.error("Erreur chargement chercheurs :", err));
@@ -19,7 +19,7 @@ const ListeChercheurs = () => {
   }, []);
 
   const deleteChercheur = (id) => {
-    fetch(`http://localhost:8081/chercheurs/${id}`, {
+    fetch(`http://localhost:8081/api/chercheurs/${id}`, {
       method: "DELETE",
     })
       .then(() => fetchChercheurs())

@@ -20,7 +20,7 @@ const EditChercheur = ({ chercheur, onChercheurUpdated, onCancel }) => {
 
     const updatedChercheur = { nom, prenom, email, specialite };
 
-    fetch(`http://localhost:8081/chercheurs/${chercheur.id}`, {
+    fetch(`http://localhost:8081/api/chercheurs/${chercheur.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedChercheur),

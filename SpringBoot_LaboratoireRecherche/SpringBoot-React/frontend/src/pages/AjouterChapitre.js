@@ -15,7 +15,7 @@ const AjouterChapitre = ({ onChapitreAdded }) => {
   const [selectedAuteurs, setSelectedAuteurs] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8081/auteurs")
+    fetch("http://localhost:8081/api/auteurs")
       .then((res) => res.json())
       .then((data) => {
         const sorted = data.sort((a, b) => a.nom.localeCompare(b.nom));
@@ -40,7 +40,7 @@ const AjouterChapitre = ({ onChapitreAdded }) => {
       auteurs: selectedAuteurs.map((id) => ({ id: parseInt(id) })),
     };
 
-    fetch("http://localhost:8081/chapitres", {
+    fetch("http://localhost:8081/api/chapitres", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(chapitreData),
