@@ -12,7 +12,7 @@ const AjouterLivre = ({ onLivreAdded, onCancel }) => {
   const [auteurs, setAuteurs] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8081/auteurs")
+    fetch("http://localhost:8081/api/auteurs")
       .then((res) => res.json())
       .then((data) => setAuteurs(data))
       .catch((err) => console.error("Erreur chargement auteurs:", err));
@@ -35,7 +35,7 @@ const AjouterLivre = ({ onLivreAdded, onCancel }) => {
       auteurs: form.auteurs.map((id) => ({ id: parseInt(id) })),
     };
 
-    fetch("http://localhost:8081/livres", {
+    fetch("http://localhost:8081/api/livres", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(livreData),

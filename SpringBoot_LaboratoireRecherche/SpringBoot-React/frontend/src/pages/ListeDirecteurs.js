@@ -8,7 +8,7 @@ const ListeDirecteurs = () => {
   const [showForm, setShowForm] = useState(false);
 
   const fetchDirecteurs = () => {
-    fetch("http://localhost:8081/directeurs")
+    fetch("http://localhost:8081/api/directeurs")
       .then((res) => res.json())
       .then((data) => setDirecteurs(data));
   };
@@ -18,7 +18,7 @@ const ListeDirecteurs = () => {
   }, []);
 
   const handleDelete = (id) => {
-    fetch(`http://localhost:8081/directeurs/${id}`, {
+    fetch(`http://localhost:8081/api/directeurs/${id}`, {
       method: "DELETE",
     }).then(() => fetchDirecteurs());
   };

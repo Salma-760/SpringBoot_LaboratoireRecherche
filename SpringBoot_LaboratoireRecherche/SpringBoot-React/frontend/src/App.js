@@ -1,5 +1,9 @@
 import "./App.css";
+<<<<<<< HEAD
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+=======
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+>>>>>>> b5af526d34fc44be4eb472631b6e4dbd4c058764
 
 import PublicLayout from "./layouts/PublicLayout";
 import ProtectedRoute from './components/ProtectedRoute';
@@ -45,7 +49,11 @@ import ListeTheses from "./pages/ListeTheses";
 import AjouterDirecteur from "./pages/AjouterDirecteur";
 import EditDirecteur from "./pages/EditDirecteur";
 import ListeDirecteurs from "./pages/ListeDirecteurs";
+<<<<<<< HEAD
 
+=======
+import SideBarAdmin from "./pages/SideBarAdmin";
+>>>>>>> b5af526d34fc44be4eb472631b6e4dbd4c058764
 // Espace Chercheur
 import DashboardAccueilChercheur from './pages/chercheur/DashboardAccueilChercheur';
 import PublicationsChercheur from './pages/chercheur/PublicationsChercheur';
@@ -56,6 +64,7 @@ function App() {
   return (
     <Router>
       <Routes>
+<<<<<<< HEAD
 
         {/* Layout Public */}
         <Route path="/" element={<PublicLayout />}>
@@ -101,6 +110,97 @@ function App() {
           <Route path="ListeDirecteurs" element={<ListeDirecteurs />} />
         </Route>
 
+=======
+        {/* Layout Public */}
+        <Route path="/" element={<PublicLayout />}>
+          <Route index element={<Home />} />
+          <Route path="about" element={<About />} />
+          <Route path="actualites" element={<Actualites />} />
+          <Route path="actualite/:id" element={<ActualiteDetail />} />
+          <Route path="articles" element={<Articles />} />
+          <Route path="ateliers" element={<Ateliers />} />
+          <Route path="cours" element={<Cours />} />
+          <Route path="equipe" element={<Equipe />} />
+          <Route path="evenements" element={<Evenements />} />
+          <Route path="missions" element={<Missions />} />
+          <Route path="offres" element={<Offres />} />
+          <Route path="projets" element={<Projets />} />
+          <Route path="publications" element={<Publications />} />
+          <Route path="revues" element={<Revues />} />
+          <Route path="stages" element={<Stages />} />
+          <Route path="AjouterEtudiant" element={<AjouterEtudiant />} />
+
+          {/* Nouvelles pages */}
+          <Route path="AjouterPublication" element={<AjouterPublication />} />
+          <Route path="ModifierPublication" element={<ModifierPublication />} />
+          <Route path="ModifierPublication/:id" element={<ModifierPublication />} />
+          <Route path="ListePublication" element={<ListePublication />} />
+          <Route path="AjouterAuteur" element={<AjouterAuteur />} />
+          <Route path="EditAuteur" element={<EditAuteur />} />
+          <Route path="ListeAuteurs" element={<ListeAuteurs />} />
+          <Route path="AjouterChercheur" element={<AjouterChercheur />} />
+          <Route path="EditChercheur" element={<EditChercheur />} />
+          <Route path="ListeChercheurs" element={<ListeChercheurs />} />
+          <Route path="AjouterChapitre" element={<AjouterChapitre />} />
+          <Route path="EditChapitre" element={<EditChapitre />} />
+          <Route path="ListeChapitres" element={<ListeChapitres />} />
+          <Route path="AjouterLivre" element={<AjouterLivre />} />
+          <Route path="EditLivre" element={<EditLivre />} />
+          <Route path="ListeLivres" element={<ListeLivres />} />
+          <Route path="AjouterThese" element={<AjouterThese />} />
+          <Route path="EditThese" element={<EditThese />} />
+          <Route path="ListeTheses" element={<ListeTheses />} />
+          <Route path="AjouterDirecteur" element={<AjouterDirecteur />} />
+          <Route path="EditDirecteur" element={<EditDirecteur />} />
+          <Route path="ListeDirecteurs" element={<ListeDirecteurs />} />
+          <Route path="SideBarAdmin" element={<SideBarAdmin />} />
+        </Route>
+
+        {/* Layout Admin */}
+        <Route
+          path="/admin"
+          element={
+            <AdminPage />
+          }
+        >
+          <Route index element={<Navigate to="publications" />} />
+          {/* Publications */}
+          <Route path="publications" element={<ListePublication />} />
+          <Route path="ajouter-publication" element={<AjouterPublication />} />
+          <Route path="modifier-publication/:id" element={<ModifierPublication />} />
+
+          {/* Auteurs */}
+          <Route path="auteurs" element={<ListeAuteurs />} />
+          <Route path="ajouter-auteur" element={<AjouterAuteur />} />
+          <Route path="modifier-auteur/:id" element={<EditAuteur />} />
+
+          {/* Chercheurs */}
+          <Route path="chercheurs" element={<ListeChercheurs />} />
+          <Route path="ajouter-chercheur" element={<AjouterChercheur />} />
+          <Route path="modifier-chercheur/:id" element={<EditChercheur />} />
+
+          {/* Chapitres */}
+          <Route path="chapitres" element={<ListeChapitres />} />
+          <Route path="ajouter-chapitre" element={<AjouterChapitre />} />
+          <Route path="modifier-chapitre/:id" element={<EditChapitre />} />
+
+          {/* Livres */}
+          <Route path="livres" element={<ListeLivres />} />
+          <Route path="ajouter-livre" element={<AjouterLivre />} />
+          <Route path="modifier-livre/:id" element={<EditLivre />} />
+
+          {/* Thèses */}
+          <Route path="theses" element={<ListeTheses />} />
+          <Route path="ajouter-these" element={<AjouterThese />} />
+          <Route path="modifier-these/:id" element={<EditThese />} />
+
+          {/* Directeurs */}
+          <Route path="directeurs" element={<ListeDirecteurs />} />
+          <Route path="ajouter-directeur" element={<AjouterDirecteur />} />
+          <Route path="modifier-directeur/:id" element={<EditDirecteur />} />
+        </Route>
+
+>>>>>>> b5af526d34fc44be4eb472631b6e4dbd4c058764
         {/* Layout Chercheur */}
         <Route
           path="/chercheur"
@@ -115,6 +215,7 @@ function App() {
           <Route path="ajouter-publication" element={<AjouterPublicationChercheur />} />
           <Route path="profil" element={<ProfilChercheur />} />
         </Route>
+<<<<<<< HEAD
 
         {/* Layout Admin */}
         <Route
@@ -126,6 +227,8 @@ function App() {
           }
         />
 
+=======
+>>>>>>> b5af526d34fc44be4eb472631b6e4dbd4c058764
       </Routes>
     </Router>
   );

@@ -7,20 +7,28 @@ const AuteurModifier = ({ auteur, onAuteurUpdated, onCancel }) => {
 
   useEffect(() => {
     if (auteur) {
-      setNom(auteur.nom);
-      setPrenom(auteur.prenom);
-      setEmail(auteur.email);
+      setNom(auteur.nom || "");
+      setPrenom(auteur.prenom || "");
+      setEmail(auteur.email || "");
     }
   }, [auteur]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch(`http://localhost:8081/auteurs/${auteur.id}`, {
+    const token = localStorage.getItem("token");
+
+    fetch(`http://localhost:8081/api/auteurs/${auteur.id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({ nom, prenom, email }),
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("Erreur HTTP " + res.status);
+        return res.json();
+      })
       .then(() => {
         onAuteurUpdated();
         onCancel();
@@ -49,14 +57,18 @@ const AuteurModifier = ({ auteur, onAuteurUpdated, onCancel }) => {
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="w-full p-2 mb-2 border rounded"
+        className="w-full p-2 mb-4 border rounded"
         required
       />
       <div className="flex gap-2">
         <button type="submit" className="bg-yellow-500 text-white px-4 py-2 rounded">
           Enregistrer
         </button>
-        <button type="button" onClick={onCancel} className="bg-gray-500 text-white px-4 py-2 rounded">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="bg-gray-500 text-white px-4 py-2 rounded"
+        >
           Annuler
         </button>
       </div>

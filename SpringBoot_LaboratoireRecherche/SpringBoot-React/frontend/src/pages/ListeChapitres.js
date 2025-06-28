@@ -8,7 +8,7 @@ const ListeChapitres = () => {
   const [showForm, setShowForm] = useState(false);
 
   const fetchChapitres = () => {
-    fetch("http://localhost:8081/chapitres")
+    fetch("http://localhost:8081/api/chapitres")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -29,7 +29,7 @@ const ListeChapitres = () => {
   }, []);
 
   const handleDelete = (id) => {
-    fetch(`http://localhost:8081/chapitres/${id}`, {
+    fetch(`http://localhost:8081/api/chapitres/${id}`, {
       method: "DELETE",
     }).then(() => fetchChapitres());
   };

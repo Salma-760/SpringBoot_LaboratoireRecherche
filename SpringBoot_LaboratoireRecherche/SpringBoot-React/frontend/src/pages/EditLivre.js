@@ -13,7 +13,7 @@ const EditLivre = ({ livre, onLivreUpdated, onCancel }) => {
 
   useEffect(() => {
     // Charger la liste des auteurs
-    fetch("http://localhost:8081/auteurs")
+    fetch("http://localhost:8081/api/auteurs")
       .then(res => res.json())
       .then(data => setAuteurs(data));
 
@@ -45,7 +45,7 @@ const EditLivre = ({ livre, onLivreUpdated, onCancel }) => {
       auteurs: form.auteurs.map(id => ({ id: parseInt(id) }))
     };
 
-    fetch(`http://localhost:8081/livres/${livre.id}`, {
+    fetch(`http://localhost:8081/api/livres/${livre.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedLivre)

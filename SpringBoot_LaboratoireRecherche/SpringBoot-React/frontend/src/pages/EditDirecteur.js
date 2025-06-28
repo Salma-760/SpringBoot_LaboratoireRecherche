@@ -9,7 +9,7 @@ const EditDirecteur = ({ directeur, onDirecteurUpdated, onCancel }) => {
 
   const handleUpdate = (e) => {
     e.preventDefault();
-    fetch(`http://localhost:8081/directeurs/${directeur.id}`, {
+    fetch(`http://localhost:8081/api/directeurs/${directeur.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),

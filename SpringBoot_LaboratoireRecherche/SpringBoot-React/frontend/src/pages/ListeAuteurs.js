@@ -8,7 +8,7 @@ const ListeAuteurs = () => {
   const [showFormAjout, setShowFormAjout] = useState(false);
 
   const fetchAuteurs = () => {
-    fetch("http://localhost:8081/auteurs")
+    fetch("http://localhost:8081/api/auteurs")
       .then((res) => res.json())
       .then((data) => setAuteurs(data))
       .catch((err) => console.error("Erreur chargement auteurs :", err));
@@ -19,7 +19,7 @@ const ListeAuteurs = () => {
   }, []);
 
   const deleteAuteur = (id) => {
-    fetch(`http://localhost:8081/auteurs/${id}`, {
+    fetch(`http://localhost:8081/api/auteurs/${id}`, {
       method: "DELETE",
     })
       .then(() => fetchAuteurs())

@@ -9,7 +9,7 @@ const ListeLivres = () => {
   const [livreToEdit, setLivreToEdit] = useState(null);
 
   const fetchLivres = () => {
-    fetch("http://localhost:8081/livres")
+    fetch("http://localhost:8081/api/livres")
       .then((res) => res.json())
       .then((data) => setLivres(data))
       .catch((err) => console.error("Erreur chargement livres:", err));
@@ -20,7 +20,7 @@ const ListeLivres = () => {
   }, []);
 
   const handleDelete = (id) => {
-    fetch(`http://localhost:8081/livres/${id}`, {
+    fetch(`http://localhost:8081/api/livres/${id}`, {
       method: "DELETE",
     }).then(() => fetchLivres());
   };

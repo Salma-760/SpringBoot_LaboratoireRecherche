@@ -46,7 +46,7 @@ const ModifierPublication = ({ publication, auteursDisponibles, onCancel, onSave
       // baseIndexation est déjà un tableau prêt à être envoyé
     };
 
-    fetch(`http://localhost:8081/publications/${form.id}`, {
+    fetch(`http://localhost:8081/api/publications/${form.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedPublication),
