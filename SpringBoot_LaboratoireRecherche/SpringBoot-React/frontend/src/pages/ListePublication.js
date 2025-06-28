@@ -1,31 +1,25 @@
 import React, { useEffect, useState } from "react";
-import EditPublication from "./ModifierPublication";
-import AjouterPublication from "./AjouterPublication"; // import du formulaire ajout
 import { TrashIcon, PencilSquareIcon } from "@heroicons/react/24/solid";
+import AjouterPublication from "./AjouterPublication";
+import EditPublication from "./ModifierPublication";
 
 const ListePublications = () => {
   const [publications, setPublications] = useState([]);
   const [auteurs, setAuteurs] = useState([]);
   const [publicationToEdit, setPublicationToEdit] = useState(null);
-  const [isAdding, setIsAdding] = useState(false); // état pour afficher ajout
+  const [isAdding, setIsAdding] = useState(false);
 
   const fetchPublications = () => {
     fetch("http://localhost:8081/publications")
       .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) setPublications(data);
-        else setPublications([]);
-      })
+      .then(data => Array.isArray(data) ? setPublications(data) : setPublications([]))
       .catch(err => console.error("Erreur fetchPublications:", err));
   };
 
   const fetchAuteurs = () => {
     fetch("http://localhost:8081/auteurs")
       .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) setAuteurs(data);
-        else setAuteurs([]);
-      })
+      .then(data => Array.isArray(data) ? setAuteurs(data) : setAuteurs([]))
       .catch(err => console.error("Erreur fetchAuteurs:", err));
   };
 
@@ -37,10 +31,9 @@ const ListePublications = () => {
   const handleDelete = (id) => {
     fetch(`http://localhost:8081/publications/${id}`, { method: "DELETE" })
       .then(() => setPublications(publications.filter(p => p.id !== id)))
-      .catch(err => console.error("Erreur suppression publication:", err));
+      .catch(err => console.error("Erreur suppression:", err));
   };
 
-  // Après sauvegarde ou ajout, refresh la liste et ferme les formulaires
   const handleSave = () => {
     setPublicationToEdit(null);
     setIsAdding(false);
@@ -48,79 +41,68 @@ const ListePublications = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-50 flex flex-col items-center py-12 px-6">
-      <h2 className="text-4xl font-black text-blue-800 mb-6 tracking-tight">Liste des Publications</h2>
+    <div className="min-h-screen bg-gray-100 py-10 px-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-800">Liste des Publications</h2>
+          {!isAdding && !publicationToEdit && (
+            <button
+              onClick={() => setIsAdding(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow"
+            >
+              Ajouter une publication
+            </button>
+          )}
+        </div>
 
-     
+        {isAdding && (
+          <AjouterPublication
+            auteursDisponibles={auteurs}
+            onCancel={() => setIsAdding(false)}
+            onSave={handleSave}
+          />
+        )}
 
-      {/* Formulaire d'ajout affiché si isAdding = true */}
-      {!isAdding && !publicationToEdit && (
-  <div className="w-full mb-6 flex justify-start"> {/* Conteneur à gauche */}
-    <button
-      onClick={() => setIsAdding(true)}
-      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition"
-    >
-      Ajouter une publication
-    </button>
-  </div>
-)}
+        {publicationToEdit && (
+          <EditPublication
+            publication={publicationToEdit}
+            auteursDisponibles={auteurs}
+            onCancel={() => setPublicationToEdit(null)}
+            onSave={handleSave}
+          />
+        )}
 
-      {/* Formulaire de modification */}
-      {publicationToEdit && (
-        <EditPublication
-          publication={publicationToEdit}
-          auteursDisponibles={auteurs}
-          onCancel={() => setPublicationToEdit(null)}
-          onSave={handleSave}
-        />
-      )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {publications.map(pub => (
+            <div key={pub.id} className="bg-white rounded-xl shadow-lg p-6 space-y-2 hover:shadow-xl transition">
+              <h3 className="text-xl font-semibold text-blue-700">{pub.titre}</h3>
+              <p><span className="font-semibold">Journal:</span> {pub.journal}</p>
+              <p><span className="font-semibold">Indexation:</span> {pub.baseIndexation}</p>
+              <p><span className="font-semibold">Année:</span> {pub.annee}</p>
+              <p><span className="font-semibold">Volume:</span> {pub.volume} | <span className="font-semibold">Pages:</span> {pub.pages}</p>
+              <p><span className="font-semibold">DOI:</span> {pub.doi}</p>
+              <p><span className="font-semibold">Auteurs:</span> {Array.isArray(pub.auteurs) ? pub.auteurs.map(a => a.nom).join(", ") : ""}</p>
 
-      {/* Tableau des publications */}
-      <table className="min-w-full table-auto text-left text-base text-gray-700 bg-white rounded shadow-md overflow-hidden">
-        <thead className="bg-blue-100 text-blue-700">
-          <tr>
-           
-            <th className="px-6 py-3">Titre</th>
-            <th className="px-6 py-3">Journal</th>
-            <th className="px-6 py-3">Base_Indexation</th>
-            <th className="px-6 py-3">Année</th>
-            <th className="px-6 py-3">Volume</th>
-            <th className="px-6 py-3">Pages</th>
-            <th className="px-6 py-3">DOI</th>
-            <th className="px-6 py-3">Auteurs</th>
-            <th className="px-6 py-3 text-center">Actions</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-blue-200">
-          {publications.map(p => (
-            <tr key={p.id} className="hover:bg-blue-50 transition">
-              <td className="px-6 py-4 font-medium text-gray-900">{p.id}</td>
-              <td className="px-6 py-4">{p.titre}</td>
-              <td className="px-6 py-4">{p.journal}</td>
-              <td className="px-6 py-4">{Array.isArray(p.baseIndexation) ? p.baseIndexation.join(", ") : p.baseIndexation}</td>
-              <td className="px-6 py-4">{p.annee}</td>
-              <td className="px-6 py-4">{p.volume}</td>
-              <td className="px-6 py-4">{p.pages}</td>
-              <td className="px-6 py-4">{p.doi}</td>
-              <td className="px-6 py-4">{Array.isArray(p.auteurs) ? p.auteurs.map(a => a.nom).join(", ") : ""}</td>
-              <td className="px-6 py-4 flex items-center justify-center space-x-2">
+              <div className="flex justify-end gap-2 mt-4">
                 <button
-                  onClick={() => setPublicationToEdit(p)}
-                  className="bg-blue-400 hover:bg-blue-500 text-white font-semibold px-4 py-2 rounded-xl shadow-md transition-transform hover:scale-105 flex items-center"
+                  onClick={() => setPublicationToEdit(pub)}
+                  className="flex items-center bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm"
                 >
-                  <PencilSquareIcon className="h-5 w-5 mr-1" /> Modifier
+                  <PencilSquareIcon className="w-4 h-4 mr-1" />
+                  Modifier
                 </button>
                 <button
-                  onClick={() => handleDelete(p.id)}
-                  className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-xl shadow-md transition-transform hover:scale-105 flex items-center"
+                  onClick={() => handleDelete(pub.id)}
+                  className="flex items-center bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm"
                 >
-                  <TrashIcon className="h-5 w-5 mr-1" /> Supprimer
+                  <TrashIcon className="w-4 h-4 mr-1" />
+                  Supprimer
                 </button>
-              </td>
-            </tr>
+              </div>
+            </div>
           ))}
-        </tbody>
-      </table>
+        </div>
+      </div>
     </div>
   );
 };
