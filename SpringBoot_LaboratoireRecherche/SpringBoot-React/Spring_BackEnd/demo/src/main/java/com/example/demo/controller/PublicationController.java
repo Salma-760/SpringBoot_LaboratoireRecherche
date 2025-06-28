@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/publications")
+@RequestMapping("/api/publications")
 @CrossOrigin(origins = "http://localhost:3000")
 
 public class PublicationController {

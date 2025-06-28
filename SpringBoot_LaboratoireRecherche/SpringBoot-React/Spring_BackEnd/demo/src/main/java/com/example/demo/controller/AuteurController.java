@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/auteurs")
+@RequestMapping("/api/auteurs")
 @CrossOrigin(origins = "http://localhost:3000")
 public class AuteurController {
 

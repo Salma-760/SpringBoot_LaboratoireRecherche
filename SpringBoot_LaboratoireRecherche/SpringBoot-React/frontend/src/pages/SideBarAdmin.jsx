@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import {
   Bars3Icon,
   HomeIcon,
@@ -12,6 +12,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 const SidebarAdmin = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(true);
   const [openSections, setOpenSections] = useState({});
@@ -19,14 +20,18 @@ const SidebarAdmin = () => {
   const isActive = (path) => location.pathname === path;
 
   const linkClass = (path) =>
-    `w-full flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all duration-150 ${
-      isActive(path)
-        ? "bg-purple-700 text-white"
-        : "text-gray-300 hover:bg-purple-600 hover:text-white"
+    `w-full flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all duration-150 ${isActive(path)
+      ? "bg-purple-700 text-white"
+      : "text-gray-300 hover:bg-purple-600 hover:text-white"
     }`;
 
   const toggleSection = (section) => {
     setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/");
   };
 
   const Section = ({ title, icon, basePath, routes }) => (
@@ -61,9 +66,8 @@ const SidebarAdmin = () => {
 
   return (
     <div
-      className={`${
-        isOpen ? "w-64" : "w-16"
-      } bg-[#1E1E2F] text-white flex flex-col p-4 min-h-screen transition-all duration-300 shadow-lg`}
+      className={`${isOpen ? "w-64" : "w-16"
+        } bg-[#1E1E2F] text-white flex flex-col p-4 min-h-screen transition-all duration-300 shadow-lg`}
     >
       {/* Toggle Icon */}
       <div className="flex items-center justify-start mb-4">
@@ -166,7 +170,7 @@ const SidebarAdmin = () => {
         />
 
         {/* Déconnexion */}
-        <button className="mt-10 flex items-center w-full px-4 py-2 text-red-400 hover:text-red-200">
+        <button onClick={handleLogout} className="mt-10 flex items-center w-full px-4 py-2 text-red-400 hover:text-red-200">
           <ArrowRightOnRectangleIcon className="w-5 h-5 mr-2" />
           {isOpen && <span>Déconnexion</span>}
         </button>

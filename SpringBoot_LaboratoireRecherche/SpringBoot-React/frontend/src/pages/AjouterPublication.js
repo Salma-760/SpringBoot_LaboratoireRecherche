@@ -61,10 +61,6 @@ const AjouterPublication = ({ onSave, onCancel }) => {
       pages: Number(publication.pages) || 0,
     };
     delete dtoToSend.baseIndexations;
-<<<<<<< HEAD
-
-=======
->>>>>>> b5af526d34fc44be4eb472631b6e4dbd4c058764
 
     fetch("http://localhost:8081/api/publications", {
       method: "POST",

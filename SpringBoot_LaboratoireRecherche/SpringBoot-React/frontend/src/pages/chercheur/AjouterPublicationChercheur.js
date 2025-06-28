@@ -12,7 +12,6 @@ const baseIndexationOptions = [
 const AjouterPublicationChercheur = () => {
     const { chercheur } = useOutletContext();
 
-    // ================== VÉRIFICATION CRUCIALE ==================
     // Ce log s'affichera dans la console du navigateur dès que la page se charge.
     // Vérifiez que l'objet 'chercheur' contient bien les bonnes informations.
     console.log("Objet 'chercheur' reçu depuis le contexte :", chercheur);
@@ -59,7 +58,7 @@ const AjouterPublicationChercheur = () => {
         // Ce log est le plus important. Vérifiez sa sortie dans la console du navigateur.
         console.log("Payload FINAL envoyé au backend :", dtoToSend);
 
-        fetch("http://localhost:8081/publications/soumettre", {
+        fetch("http://localhost:8081/api/publications/soumettre", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
             body: JSON.stringify(dtoToSend),
