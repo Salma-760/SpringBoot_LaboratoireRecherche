@@ -9,8 +9,8 @@ import {
   ArrowRightOnRectangleIcon,
   ChevronDownIcon,
   ChevronUpIcon,
+  CheckBadgeIcon,
 } from "@heroicons/react/24/outline";
-
 const SidebarAdmin = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -106,6 +106,7 @@ const SidebarAdmin = () => {
           routes={[
             { path: "/admin/publications", label: "Liste", Icon: UserGroupIcon },
             { path: "/admin/ajouter-publication", label: "Ajouter", Icon: PlusCircleIcon },
+            { path: "/admin/valider-publications", label: "Validation", Icon: CheckBadgeIcon },
           ]}
         />
 

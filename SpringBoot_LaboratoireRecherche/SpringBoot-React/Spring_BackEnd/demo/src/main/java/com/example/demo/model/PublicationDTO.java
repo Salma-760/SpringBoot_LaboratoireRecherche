@@ -13,6 +13,7 @@ public class PublicationDTO {
     private String doi;
     private Set<AuteurDTO> auteurs;
     private String statut;
+    private String resume;
 
     public PublicationDTO() {}
 
@@ -49,5 +50,12 @@ public class PublicationDTO {
 
     public void setStatut(String statut) {
         this.statut = statut;
+    }
+    
+    public String getResume() {
+        return resume;
+    }
+    public void setResume(String resume) {
+        this.resume = resume;
     }
 }

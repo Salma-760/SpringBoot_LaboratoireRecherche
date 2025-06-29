@@ -17,6 +17,9 @@ public class Publication {
 
     private String titre;
     private String journal;
+    
+    @Column(columnDefinition = "TEXT")
+    private String resume; 
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "publication_base_indexation", joinColumns = @JoinColumn(name = "publication_id"))
@@ -64,6 +67,12 @@ public class Publication {
         this.journal = journal;
     }
 
+    public String getResume() {
+        return resume;
+    }
+    public void setResume(String resume) {
+        this.resume = resume;
+    }
     public Set<String> getBaseIndexation() {
         return baseIndexation;
     }

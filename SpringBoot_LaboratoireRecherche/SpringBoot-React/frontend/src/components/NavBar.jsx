@@ -14,11 +14,12 @@ const menuItems = {
   ],
   "Recherche": [
     { name: "Projets", link: "/projets" },
-    { name: "Publications", link: "/publications" },
+    { name: "Publications", link: "/recherche/publication" },
   ],
   "Publications": [
     { name: "Articles récents", link: "/articles" },
     { name: "Revues scientifiques", link: "/revues" },
+    { name: "Publications", link: "/publication" },
   ],
   "Formation": [
     { name: "Cours en ligne", link: "/cours" },

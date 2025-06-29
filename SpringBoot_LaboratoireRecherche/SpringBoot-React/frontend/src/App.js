@@ -22,11 +22,15 @@ import Projets from "./pages/Projets";
 import Publications from "./pages/Publications";
 import Revues from "./pages/Revues";
 import Stages from "./pages/Stages";
+import ResultatsRecherche from './pages/ResultatsRecherche';
+import RecherchePublicationPage from './pages/RecherchePublicationPage'
 import AjouterEtudiant from "./pages/AjouterEtudiant";
 
 import AjouterPublication from "./pages/AjouterPublication";
 import ModifierPublication from "./pages/ModifierPublication";
 import ListePublication from "./pages/ListePublication";
+import ValidationPublications from './pages/ValidationPublications';
+import ListePublicationsPubliques from './pages/ListePublicationsPubliques';
 import AjouterAuteur from "./pages/AjouterAuteur";
 import EditAuteur from "./pages/EditAuteur";
 import ListeAuteurs from "./pages/ListeAuteurs";
@@ -74,6 +78,9 @@ function App() {
           <Route path="revues" element={<Revues />} />
           <Route path="stages" element={<Stages />} />
           <Route path="AjouterEtudiant" element={<AjouterEtudiant />} />
+          <Route path="recherche" element={<ResultatsRecherche />} />
+          <Route path="recherche/publication" element={<RecherchePublicationPage />} />
+          <Route path="publication" element={<ListePublicationsPubliques />} />
 
           {/* Nouvelles pages */}
           <Route path="AjouterPublication" element={<AjouterPublication />} />
@@ -113,6 +120,7 @@ function App() {
           <Route path="publications" element={<ListePublication />} />
           <Route path="ajouter-publication" element={<AjouterPublication />} />
           <Route path="modifier-publication/:id" element={<ModifierPublication />} />
+          <Route path="valider-publications" element={<ValidationPublications />} />
 
           {/* Auteurs */}
           <Route path="auteurs" element={<ListeAuteurs />} />

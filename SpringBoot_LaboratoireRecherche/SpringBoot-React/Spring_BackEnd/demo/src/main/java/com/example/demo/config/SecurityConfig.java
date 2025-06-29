@@ -62,35 +62,38 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // ===================== 1. RÈGLES PUBLIQUES (permitAll) =====================
-                        // Tout le monde, même non connecté, peut accéder à ces URLs.
+                        // ===================== RÈGLES PUBLIQUES (permitAll) =====================
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/actualites/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/evenements/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/projets/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/equipe/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/auteurs/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/publications").permitAll()
+                        // Seule la liste des publications VALIDÉES est publique
+                        .requestMatchers(HttpMethod.GET, "/api/publications").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/publications/validees").permitAll() 
 
-                        // ===================== 2. RÈGLES POUR UTILISATEURS CONNECTÉS (authenticated) =====================
-                        // N'importe quel utilisateur connecté, peu importe son rôle.
-                       
-                        .requestMatchers(HttpMethod.POST, "/publications/soumettre").permitAll()
+                        // ===================== RÈGLES POUR UTILISATEURS CONNECTÉS (authenticated) =====================
                         .requestMatchers(HttpMethod.GET, "/api/utilisateurs/me").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/utilisateurs/me").authenticated()
+                        // Soumettre et voir ses propres publications requiert d'être connecté
+                        .requestMatchers(HttpMethod.POST, "/api/publications/soumettre").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/publications/mes-publications").authenticated()
+                        .requestMatchers("/api/chercheur-dashboard/**").authenticated()
 
-                        // ===================== 3. RÈGLES SPÉCIFIQUES PAR RÔLE (hasRole) =====================
-                        
-                        .requestMatchers(HttpMethod.GET, "/publications/en-attente").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/publications/*/valider").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/publications/*/refuser").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/publications").hasRole("ADMIN") // Endpoint de création directe par admin
-                        .requestMatchers(HttpMethod.PUT, "/publications/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/publications/**").hasRole("ADMIN")
+                        // ===================== RÈGLES SPÉCIFIQUES AUX ADMINS (hasRole('ADMIN')) =====================
+                        .requestMatchers(HttpMethod.GET, "/api/publications/en-attente").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/publications/*/valider").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/publications/*/refuser").hasRole("ADMIN")
+                        // La création directe, la mise à jour et la suppression sont pour les admins
+                        .requestMatchers(HttpMethod.POST, "/api/publications").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/publications/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/publications/**").hasRole("ADMIN")
+                        // Endpoint générique pour l'espace admin
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                        // ===================== 4. RÈGLE FINALE (Fallback) =====================
-                        // Toute autre requête non listée ci-dessus doit être authentifiée.
+                        // ===================== RÈGLE FINALE (Fallback) =====================
+                        // Toute autre requête non listée ci-dessus est refusée par défaut. C'est plus sûr.
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

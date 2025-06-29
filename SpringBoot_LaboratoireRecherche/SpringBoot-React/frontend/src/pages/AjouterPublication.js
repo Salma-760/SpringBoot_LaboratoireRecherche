@@ -15,8 +15,9 @@ const AjouterPublication = ({ onSave, onCancel }) => {
     baseIndexations: [],
     annee: "",
     volume: "",
-    pages: "",
+    pages: "", // Le champ pages est une chaîne de caractères
     doi: "",
+    resume: "",
     auteurs: [],
   });
 
@@ -53,14 +54,20 @@ const AjouterPublication = ({ onSave, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Log pour s'assurer que la fonction est bien appelée
+    console.log("Tentative de soumission du formulaire...");
+
     const dtoToSend = {
-      ...publication,
+      ...publication, // Inclut déjà titre, journal, resume, pages (string), doi, auteurs
       baseIndexation: publication.baseIndexations,
-      annee: Number(publication.annee) || 0,
+      annee: Number(publication.annee) || null, // Mettre à null si invalide
       volume: Number(publication.volume) || 0,
-      pages: Number(publication.pages) || 0,
     };
     delete dtoToSend.baseIndexations;
+
+    // Log pour voir exactement ce qui est envoyé
+    console.log("Payload envoyé au backend:", dtoToSend);
 
     fetch("http://localhost:8081/api/publications", {
       method: "POST",
@@ -71,55 +78,68 @@ const AjouterPublication = ({ onSave, onCancel }) => {
       body: JSON.stringify(dtoToSend),
     })
       .then((res) => {
-        if (!res.ok) throw new Error("Erreur HTTP " + res.status);
-        onSave(); // recharge les publications dans ListePublication
+        if (!res.ok) {
+          // Loguer le corps de l'erreur pour un meilleur débogage
+          res.text().then(text => console.error("Erreur HTTP:", res.status, text));
+          throw new Error("Erreur HTTP " + res.status);
+        }
+        return res.json();
       })
-      .catch((err) => console.error("Erreur:", err));
+      .then(() => {
+        alert("Publication ajoutée avec succès !");
+        onSave(); // recharge les publications dans le composant parent
+      })
+      .catch((err) => {
+        console.error("Erreur lors de la soumission:", err);
+        alert("Une erreur est survenue. Vérifiez la console pour les détails.");
+      });
   };
 
   return (
-    <div className="bg-white rounded-[2rem] shadow-md p-10 w-full max-w-4xl mx-auto mb-8">
-      <div className="flex justify-between items-center mb-6">
+    <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-10 w-full max-w-4xl mx-auto mb-8">
+      <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
         <h2 className="text-3xl font-bold text-blue-700 flex items-center">
-          <SparklesIcon className="h-7 w-7 mr-2" />
+          <SparklesIcon className="h-7 w-7 mr-3" />
           Nouvelle Publication
         </h2>
         <button
           onClick={onCancel}
-          className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 rounded-lg shadow"
+          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-4 py-2 rounded-lg transition-colors"
         >
-          Fermer
+          Annuler
         </button>
       </div>
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
         {[
-          { name: "titre", placeholder: "Titre" },
-          { name: "journal", placeholder: "Journal" },
-          { name: "annee", placeholder: "Année", type: "number" },
-          { name: "volume", placeholder: "Volume", type: "number" },
-          { name: "pages", placeholder: "Pages", type: "number" },
-          { name: "doi", placeholder: "DOI" },
-        ].map(({ name, placeholder, type = "text" }) => (
+          { name: "titre", placeholder: "Titre de la publication", type: "text" },
+          { name: "journal", placeholder: "Nom du journal", type: "text" },
+          { name: "annee", placeholder: "Année (ex: 2024)", type: "number" },
+          { name: "volume", placeholder: "Volume (si applicable)", type: "number" },
+          // CORRECTION: Le type est "text" pour permettre "15-20"
+          { name: "pages", placeholder: "Pages (ex: 15-20)", type: "text" },
+          { name: "doi", placeholder: "DOI (si applicable)", type: "text" },
+        ].map(({ name, placeholder, type }) => (
           <div key={name} className="flex flex-col">
-            <label className="text-sm font-bold text-gray-700 mb-1 capitalize">{placeholder}</label>
+            <label className="text-sm font-bold text-gray-700 mb-2 capitalize">{name}</label>
             <input
               type={type}
               name={name}
               value={publication[name]}
               onChange={handleChange}
+              placeholder={placeholder}
               required={name === "titre"}
-              className="px-4 py-3 rounded-xl border border-blue-300 focus:ring-2 focus:ring-blue-400 shadow bg-white"
+              className="px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 shadow-sm"
             />
           </div>
         ))}
 
         <div className="flex flex-col">
-          <label className="text-sm font-bold text-gray-700 mb-1">Base d'indexation</label>
+          <label className="text-sm font-bold text-gray-700 mb-2">Base d'indexation</label>
           <select
             multiple
             value={publication.baseIndexations}
             onChange={handleBaseIndexationChange}
-            className="px-4 py-3 rounded-xl border border-blue-300 focus:ring-2 focus:ring-blue-400 shadow"
+            className="px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 shadow-sm"
           >
             {baseIndexationOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -134,7 +154,7 @@ const AjouterPublication = ({ onSave, onCancel }) => {
           <select
             multiple
             onChange={handleAuteurSelect}
-            className="w-full px-4 py-3 border border-blue-300 rounded-xl shadow"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500"
           >
             {auteursList.map((a) => (
               <option key={a.id} value={a.id}>
@@ -145,9 +165,22 @@ const AjouterPublication = ({ onSave, onCancel }) => {
         </div>
 
         <div className="md:col-span-2">
+          <label htmlFor="resume" className="text-sm font-bold text-gray-700 mb-2 block">Résumé</label>
+          <textarea
+            id="resume"
+            name="resume"
+            rows="6"
+            value={publication.resume}
+            onChange={handleChange}
+            placeholder="Saisissez le résumé (abstract) de la publication ici..."
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 shadow-sm"
+          />
+        </div>
+
+        <div className="md:col-span-2 pt-4">
           <button
             type="submit"
-            className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg rounded-2xl font-bold shadow-lg"
+            className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg rounded-2xl font-bold shadow-lg transition-colors"
           >
             Enregistrer la publication
           </button>
