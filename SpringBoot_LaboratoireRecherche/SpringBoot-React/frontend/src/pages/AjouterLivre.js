@@ -14,16 +14,22 @@ const AjouterLivre = ({ onLivreAdded, onCancel }) => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    console.log("Chargement auteurs avec token:", token);
     fetch("http://localhost:8081/api/auteurs", {
       headers: {
         Authorization: token ? `Bearer ${token}` : "",
       },
     })
       .then((res) => {
+        console.log("Réponse fetch auteurs:", res);
         if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
         return res.json();
       })
-      .then((data) => setAuteurs(data))
+      .then((data) => {
+        console.log("Auteurs reçus:", data);
+        setAuteurs(data);
+        setError(null);
+      })
       .catch((err) => {
         console.error("Erreur chargement auteurs:", err);
         setError("Impossible de charger la liste des auteurs.");
@@ -48,6 +54,8 @@ const AjouterLivre = ({ onLivreAdded, onCancel }) => {
       auteurs: form.auteurs.map((id) => ({ id: parseInt(id) })),
     };
 
+    console.log("Envoi de ce livre :", livreData);
+
     fetch("http://localhost:8081/api/livres", {
       method: "POST",
       headers: {
@@ -57,10 +65,12 @@ const AjouterLivre = ({ onLivreAdded, onCancel }) => {
       body: JSON.stringify(livreData),
     })
       .then((res) => {
+        console.log("Réponse du serveur:", res);
         if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
         return res.json();
       })
-      .then(() => {
+      .then((data) => {
+        console.log("Livre ajouté avec succès :", data);
         onLivreAdded();
         setForm({
           intituleLivre: "",

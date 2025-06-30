@@ -24,7 +24,12 @@ const ListeChapitres = () => {
         return res.json();
       })
       .then((data) => {
+        console.log("✅ Données reçues des chapitres :", data); // 🔍 log global
         if (Array.isArray(data)) {
+          data.forEach((chap, index) => {
+            console.log(`➡️ Chapitre ${index + 1} :`, chap);
+            console.log(`   Auteurs :`, chap.auteurs); // 🔍 log des auteurs
+          });
           setChapitres(data);
           setError(null);
         } else {
@@ -33,6 +38,7 @@ const ListeChapitres = () => {
         }
       })
       .catch((err) => {
+        console.error("❌ Erreur lors de la récupération des chapitres :", err);
         setError("Impossible de charger les chapitres. Vérifiez votre connexion ou authentification.");
         setChapitres([]);
       });
@@ -60,6 +66,7 @@ const ListeChapitres = () => {
       })
       .catch((err) => {
         alert("Erreur lors de la suppression, voir la console.");
+        console.error("❌ Erreur suppression chapitre :", err);
       });
   };
 
@@ -122,8 +129,8 @@ const ListeChapitres = () => {
           </tr>
         </thead>
         <tbody>
-          {chapitres.map((c) => (
-            <tr key={c.id} className="bg-white">
+          {chapitres.map((c, index) => (
+            <tr key={c.id || index} className="bg-white">
               <td className="border p-2">{c.intituleChapitre || ""}</td>
               <td className="border p-2">
                 {c.titreLivre || ""} ({c.isbn || ""})
@@ -135,9 +142,12 @@ const ListeChapitres = () => {
                 {c.pageDebut || 0} à {c.pageFin || 0}
               </td>
               <td className="border p-2 text-sm">
-                {c.auteurs && c.auteurs.length > 0
-                  ? c.auteurs.map((a) => `${a?.nom || ""} ${a?.prenom || ""}`).join(", ")
-                  : ""}
+                {/* 🔍 log individuel si nécessaire */}
+                {Array.isArray(c.auteurs) && c.auteurs.length > 0
+                  ? c.auteurs.map((a, i) =>
+                      a ? `${a.nom || ""} ${a.prenom || ""}` : "Auteur inconnu"
+                    ).join(", ")
+                  : "Aucun auteur"}
               </td>
               <td className="border p-2 flex gap-2">
                 <button

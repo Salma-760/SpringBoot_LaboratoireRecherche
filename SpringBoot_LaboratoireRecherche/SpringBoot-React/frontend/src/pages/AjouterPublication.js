@@ -12,62 +12,60 @@ const AjouterPublication = ({ onSave, onCancel }) => {
   const [publication, setPublication] = useState({
     titre: "",
     journal: "",
-    baseIndexations: [],
+    baseIndexation: [],   // au singulier, tableau de strings
     annee: "",
     volume: "",
-    pages: "", // Le champ pages est une chaîne de caractères
+    pages: "",
     doi: "",
     resume: "",
-    auteurs: [],
+    auteurs: [],          // tableau d'objets { id: "..." }
   });
 
   const [auteursList, setAuteursList] = useState([]);
 
+  // Charger la liste des auteurs une fois au montage
   useEffect(() => {
     fetch("http://localhost:8081/api/auteurs", {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("token"),
       },
     })
-      .then((res) => res.json())
-      .then((data) => setAuteursList(Array.isArray(data) ? data : []))
-      .catch((err) => {
+      .then(res => res.json())
+      .then(data => setAuteursList(Array.isArray(data) ? data : []))
+      .catch(err => {
         console.error("Erreur chargement auteurs:", err);
         setAuteursList([]);
       });
   }, []);
 
+  // Gérer les changements sur les champs simples
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setPublication({ ...publication, [name]: value });
+    setPublication(prev => ({ ...prev, [name]: value }));
   };
 
+  // Gérer la sélection multiple de baseIndexation
   const handleBaseIndexationChange = (e) => {
-    const selected = Array.from(e.target.selectedOptions).map((opt) => opt.value);
-    setPublication({ ...publication, baseIndexations: selected });
+    const selected = Array.from(e.target.selectedOptions).map(opt => opt.value);
+    setPublication(prev => ({ ...prev, baseIndexation: selected }));
   };
 
+  // Gérer la sélection multiple des auteurs (objets avec id)
   const handleAuteurSelect = (e) => {
-    const selectedIds = Array.from(e.target.selectedOptions, (opt) => ({ id: opt.value }));
-    setPublication({ ...publication, auteurs: selectedIds });
+    const selectedIds = Array.from(e.target.selectedOptions).map(opt => ({ id: opt.value }));
+    setPublication(prev => ({ ...prev, auteurs: selectedIds }));
   };
 
+  // Soumettre le formulaire
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Log pour s'assurer que la fonction est bien appelée
-    console.log("Tentative de soumission du formulaire...");
-
+    // Préparer le DTO à envoyer au backend
     const dtoToSend = {
-      ...publication, // Inclut déjà titre, journal, resume, pages (string), doi, auteurs
-      baseIndexation: publication.baseIndexations,
-      annee: Number(publication.annee) || null, // Mettre à null si invalide
-      volume: Number(publication.volume) || 0,
+      ...publication,
+      annee: publication.annee ? Number(publication.annee) : null,
+      volume: publication.volume ? Number(publication.volume) : 0,
     };
-    delete dtoToSend.baseIndexations;
-
-    // Log pour voir exactement ce qui est envoyé
-    console.log("Payload envoyé au backend:", dtoToSend);
 
     fetch("http://localhost:8081/api/publications", {
       method: "POST",
@@ -77,21 +75,25 @@ const AjouterPublication = ({ onSave, onCancel }) => {
       },
       body: JSON.stringify(dtoToSend),
     })
-      .then((res) => {
+      .then(async (res) => {
         if (!res.ok) {
-          // Loguer le corps de l'erreur pour un meilleur débogage
-          res.text().then(text => console.error("Erreur HTTP:", res.status, text));
-          throw new Error("Erreur HTTP " + res.status);
+          const errorText = await res.text();
+          let message = errorText;
+          try {
+            const errorJson = JSON.parse(errorText);
+            if (errorJson.message) message = errorJson.message;
+          } catch {}
+          throw new Error(`Erreur HTTP ${res.status} : ${message}`);
         }
         return res.json();
       })
       .then(() => {
         alert("Publication ajoutée avec succès !");
-        onSave(); // recharge les publications dans le composant parent
+        if (typeof onSave === "function") onSave();
       })
       .catch((err) => {
         console.error("Erreur lors de la soumission:", err);
-        alert("Une erreur est survenue. Vérifiez la console pour les détails.");
+        alert(`Une erreur est survenue : ${err.message}\nVérifiez la console pour plus de détails.`);
       });
   };
 
@@ -115,7 +117,6 @@ const AjouterPublication = ({ onSave, onCancel }) => {
           { name: "journal", placeholder: "Nom du journal", type: "text" },
           { name: "annee", placeholder: "Année (ex: 2024)", type: "number" },
           { name: "volume", placeholder: "Volume (si applicable)", type: "number" },
-          // CORRECTION: Le type est "text" pour permettre "15-20"
           { name: "pages", placeholder: "Pages (ex: 15-20)", type: "text" },
           { name: "doi", placeholder: "DOI (si applicable)", type: "text" },
         ].map(({ name, placeholder, type }) => (
@@ -137,7 +138,7 @@ const AjouterPublication = ({ onSave, onCancel }) => {
           <label className="text-sm font-bold text-gray-700 mb-2">Base d'indexation</label>
           <select
             multiple
-            value={publication.baseIndexations}
+            value={publication.baseIndexation}
             onChange={handleBaseIndexationChange}
             className="px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 shadow-sm"
           >

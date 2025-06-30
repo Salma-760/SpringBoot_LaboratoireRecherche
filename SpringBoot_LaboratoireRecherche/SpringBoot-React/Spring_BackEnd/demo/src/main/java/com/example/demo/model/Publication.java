@@ -36,7 +36,7 @@ public class Publication {
     @Enumerated(EnumType.STRING)
     private StatutPublication statut;
 
-   @ManyToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+   @ManyToMany(cascade = { CascadeType.MERGE })
     @JoinTable(
         name = "publication_auteur",
         joinColumns = @JoinColumn(name = "publication_id"),

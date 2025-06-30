@@ -23,7 +23,6 @@ const ModifierPublication = ({ publication, auteursDisponibles, onCancel, onSave
   });
 
   useEffect(() => {
-    console.log("Publication reçue pour modification :", publication);
     setForm({
       ...publication,
       auteurs: publication.auteurs ? publication.auteurs.map(a => a.id) : [],
@@ -34,32 +33,28 @@ const ModifierPublication = ({ publication, auteursDisponibles, onCancel, onSave
   }, [publication]);
 
   const handleChange = (e) => {
-    console.log(`Champ modifié: ${e.target.name} = ${e.target.value}`);
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleBaseIndexationChange = (e) => {
     const selected = Array.from(e.target.selectedOptions).map(opt => opt.value);
-    console.log("Base d'indexation sélectionnée :", selected);
     setForm({ ...form, baseIndexation: selected });
   };
 
   const handleAuteursChange = (e) => {
     const selectedIds = Array.from(e.target.selectedOptions).map(opt => parseInt(opt.value));
-    console.log("Auteurs sélectionnés (ids) :", selectedIds);
     setForm({ ...form, auteurs: selectedIds });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Formulaire soumis avec données :", form);
 
     const updatedPublication = {
       ...form,
+      annee: form.annee ? Number(form.annee) : null,
+      volume: form.volume ? Number(form.volume) : 0,
       auteurs: form.auteurs.map(id => ({ id })),
     };
-
-    console.log("Payload envoyé au backend :", updatedPublication);
 
     fetch(`http://localhost:8081/api/publications/${form.id}`, {
       method: "PUT",
@@ -70,17 +65,15 @@ const ModifierPublication = ({ publication, auteursDisponibles, onCancel, onSave
       body: JSON.stringify(updatedPublication),
     })
       .then(res => {
-        console.log("Réponse du backend à la mise à jour :", res);
         if (!res.ok) throw new Error("Erreur lors de la mise à jour");
         return res.json();
       })
       .then(data => {
-        console.log("Données retournées par le backend après mise à jour :", data);
         onSave(data);
       })
       .catch(err => {
-        console.error("Erreur attrapée lors de la mise à jour :", err);
         alert(err.message);
+        console.error(err);
       });
   };
 
@@ -139,8 +132,9 @@ const ModifierPublication = ({ publication, auteursDisponibles, onCancel, onSave
           className="w-full p-2 border rounded"
         />
 
+        {/* Change type number to text for pages */}
         <input
-          type="number"
+          type="text"
           name="pages"
           placeholder="Pages"
           value={form.pages || ""}

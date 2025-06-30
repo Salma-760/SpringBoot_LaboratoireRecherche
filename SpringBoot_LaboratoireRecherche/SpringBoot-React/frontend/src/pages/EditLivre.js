@@ -1,90 +1,90 @@
 import React, { useEffect, useState } from "react";
 
 const EditLivre = ({ livre, onLivreUpdated, onCancel }) => {
+  // Initialiser le formulaire avec les valeurs du livre passé en props
   const [form, setForm] = useState({
-    intituleLivre: "",
-    isbn: "",
-    maisonEdition: "",
-    anneeParution: "",
-    auteurs: []
+    intituleLivre: livre.intituleLivre || "",
+    isbn: livre.isbn || "",
+    maisonEdition: livre.maisonEdition || "",
+    anneeParution: livre.anneeParution || "",
+    auteurs: livre.auteursDTO ? livre.auteursDTO.map((a) => a.id.toString()) : [],
   });
 
   const [auteurs, setAuteurs] = useState([]);
   const [error, setError] = useState(null);
 
+  // Charger la liste des auteurs disponibles pour la sélection
   useEffect(() => {
     const token = localStorage.getItem("token");
-    // Charger la liste des auteurs avec token
     fetch("http://localhost:8081/api/auteurs", {
       headers: {
-        Authorization: token ? `Bearer ${token}` : ""
-      }
+        Authorization: token ? `Bearer ${token}` : "",
+      },
     })
-      .then(res => {
+      .then((res) => {
         if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
         return res.json();
       })
-      .then(data => setAuteurs(data))
-      .catch(err => {
+      .then((data) => setAuteurs(data))
+      .catch((err) => {
         console.error("Erreur chargement auteurs:", err);
         setError("Impossible de charger la liste des auteurs.");
       });
+  }, []);
 
-    // Initialiser les champs avec les valeurs du livre
-    if (livre) {
-      setForm({
-        intituleLivre: livre.intituleLivre || "",
-        isbn: livre.isbn || "",
-        maisonEdition: livre.maisonEdition || "",
-        anneeParution: livre.anneeParution || "",
-        auteurs: livre.auteurs ? livre.auteurs.map(a => a.id) : []
-      });
-    }
-  }, [livre]);
-
+  // Met à jour l'état du formulaire au changement des champs
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Gestion de la sélection multiple des auteurs
   const handleAuteurChange = (e) => {
-    const selected = [...e.target.selectedOptions].map(opt => opt.value);
+    const selected = [...e.target.selectedOptions].map((opt) => opt.value);
     setForm({ ...form, auteurs: selected });
   };
 
+  // Soumission du formulaire pour mettre à jour le livre
   const handleSubmit = (e) => {
     e.preventDefault();
+
     const token = localStorage.getItem("token");
-    const updatedLivre = {
-      ...form,
-      auteurs: form.auteurs.map(id => ({ id: parseInt(id) }))
+
+    // Préparer l'objet à envoyer, auteurs en tableau d'IDs numériques
+    const livreData = {
+      intituleLivre: form.intituleLivre,
+      isbn: form.isbn,
+      maisonEdition: form.maisonEdition,
+      anneeParution: parseInt(form.anneeParution, 10),
+      auteursIds: form.auteurs.map((id) => parseInt(id, 10)),
     };
 
     fetch(`http://localhost:8081/api/livres/${livre.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : ""
+        Authorization: token ? `Bearer ${token}` : "",
       },
-      body: JSON.stringify(updatedLivre)
+      body: JSON.stringify(livreData),
     })
-      .then(res => {
+      .then((res) => {
         if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
         return res.json();
       })
       .then(() => {
-        onLivreUpdated();
+        onLivreUpdated(); // callback pour rafraîchir la liste
         setError(null);
       })
-      .catch(err => {
-        console.error("Erreur modification livre:", err);
-        setError("Erreur lors de la modification du livre.");
+      .catch((err) => {
+        console.error("Erreur mise à jour livre:", err);
+        setError("Échec de la mise à jour du livre.");
       });
   };
 
   return (
-    <div className="bg-yellow-50 p-4 rounded shadow-md">
+    <div className="bg-yellow-100 p-4 rounded shadow-md">
       <h2 className="text-lg font-bold mb-2">Modifier un livre</h2>
       {error && <p className="text-red-600 mb-2">{error}</p>}
+
       <form onSubmit={handleSubmit} className="space-y-3">
         <input
           type="text"
@@ -95,6 +95,7 @@ const EditLivre = ({ livre, onLivreUpdated, onCancel }) => {
           className="w-full p-2 border rounded"
           required
         />
+
         <input
           type="text"
           name="isbn"
@@ -103,6 +104,7 @@ const EditLivre = ({ livre, onLivreUpdated, onCancel }) => {
           onChange={handleChange}
           className="w-full p-2 border rounded"
         />
+
         <input
           type="text"
           name="maisonEdition"
@@ -112,6 +114,7 @@ const EditLivre = ({ livre, onLivreUpdated, onCancel }) => {
           className="w-full p-2 border rounded"
           required
         />
+
         <input
           type="number"
           name="anneeParution"
@@ -140,7 +143,7 @@ const EditLivre = ({ livre, onLivreUpdated, onCancel }) => {
         <div className="flex gap-3">
           <button
             type="submit"
-            className="bg-yellow-500 text-white px-4 py-2 rounded"
+            className="bg-yellow-500 text-black px-4 py-2 rounded"
           >
             Modifier
           </button>

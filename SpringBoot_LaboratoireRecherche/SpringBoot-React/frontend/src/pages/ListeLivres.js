@@ -8,12 +8,11 @@ const ListeLivres = () => {
   const [livreToEdit, setLivreToEdit] = useState(null);
   const [error, setError] = useState(null);
 
-  // Récupérer le token JWT depuis localStorage
   const getToken = () => localStorage.getItem("token");
 
-  // Fonction pour récupérer les livres avec le token en header Authorization
   const fetchLivres = () => {
     const token = getToken();
+    console.log("Chargement livres avec token:", token);
     fetch("http://localhost:8081/api/livres", {
       headers: {
         "Content-Type": "application/json",
@@ -21,10 +20,12 @@ const ListeLivres = () => {
       },
     })
       .then((res) => {
+        console.log("Réponse fetchLivres:", res);
         if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
         return res.json();
       })
       .then((data) => {
+        console.log("Livres reçus:", data);
         setLivres(data);
         setError(null);
       })
@@ -39,9 +40,9 @@ const ListeLivres = () => {
     fetchLivres();
   }, []);
 
-  // Suppression avec token aussi
   const handleDelete = (id) => {
     const token = getToken();
+    console.log("Suppression livre id:", id);
     fetch(`http://localhost:8081/api/livres/${id}`, {
       method: "DELETE",
       headers: {
@@ -49,6 +50,7 @@ const ListeLivres = () => {
       },
     })
       .then((res) => {
+        console.log("Réponse suppression:", res);
         if (!res.ok) throw new Error(`Erreur suppression HTTP ${res.status}`);
         fetchLivres();
       })
@@ -59,6 +61,7 @@ const ListeLivres = () => {
   };
 
   const handleEdit = (livre) => {
+    console.log("Edition livre:", livre);
     setLivreToEdit(livre);
     setShowForm(false);
   };
@@ -81,6 +84,7 @@ const ListeLivres = () => {
       {showForm && (
         <AjouterLivre
           onLivreAdded={() => {
+            console.log("Livre ajouté, rechargement...");
             fetchLivres();
             setShowForm(false);
           }}
@@ -92,6 +96,7 @@ const ListeLivres = () => {
         <EditLivre
           livre={livreToEdit}
           onLivreUpdated={() => {
+            console.log("Livre modifié, rechargement...");
             fetchLivres();
             setLivreToEdit(null);
           }}
@@ -118,7 +123,7 @@ const ListeLivres = () => {
               <td className="p-2 border">{livre.maisonEdition}</td>
               <td className="p-2 border">{livre.anneeParution}</td>
               <td className="p-2 border">
-                {livre.auteurs?.map((a) => `${a.nom} ${a.prenom}`).join(", ")}
+                {livre.auteursDTO?.map((a) => `${a.nom} ${a.prenom}`).join(", ")}
               </td>
               <td className="p-2 border">
                 <button

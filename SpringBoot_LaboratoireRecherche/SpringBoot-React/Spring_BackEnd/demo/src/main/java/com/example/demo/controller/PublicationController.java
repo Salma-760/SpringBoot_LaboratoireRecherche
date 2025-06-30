@@ -104,8 +104,11 @@ public class PublicationController {
         Auteur auteurConnecte = auteurRepo.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Auteur non trouvé pour l'email: " + userDetails.getUsername()));
         Publication pub = convertToEntity(dto);
+
         pub.setStatut(StatutPublication.EN_ATTENTE);
+        // Associer uniquement l'auteur connecté (chargé depuis la base)
         pub.setAuteurs(Set.of(auteurConnecte));
+
         Publication saved = publicationRepo.save(pub);
         return ResponseEntity.status(HttpStatus.CREATED).body(convertToDTO(saved));
     }
@@ -149,8 +152,29 @@ public class PublicationController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PublicationDTO> createByAdmin(@RequestBody PublicationDTO dto) {
-        Publication pub = convertToEntity(dto);
+        Publication pub = new Publication();
+        pub.setTitre(dto.getTitre());
+        pub.setJournal(dto.getJournal());
+        pub.setBaseIndexation(dto.getBaseIndexation() != null ? dto.getBaseIndexation() : new HashSet<>());
+        pub.setAnnee(dto.getAnnee());
+        pub.setVolume(dto.getVolume());
+        pub.setPages(dto.getPages());
+        pub.setDoi(dto.getDoi());
+        pub.setResume(dto.getResume());
+
+        // Récupération sûre des auteurs attachés (existants en base)
+        Set<Auteur> auteurs = new HashSet<>();
+        if (dto.getAuteurs() != null) {
+            for (AuteurDTO aDto : dto.getAuteurs()) {
+                Auteur auteur = auteurRepo.findById(aDto.getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Auteur non trouvé avec id: " + aDto.getId()));
+                auteurs.add(auteur);
+            }
+        }
+        pub.setAuteurs(auteurs);
+
         pub.setStatut(StatutPublication.VALIDEE); 
+
         Publication saved = publicationRepo.save(pub);
         return ResponseEntity.status(HttpStatus.CREATED).body(convertToDTO(saved));
     }
@@ -158,13 +182,11 @@ public class PublicationController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
-    public ResponseEntity<PublicationDTO> update(@PathVariable(name="id") Long id, @RequestBody PublicationDTO dto) {
-        System.out.println("Début mise à jour publication id=" + id);
+    public ResponseEntity<PublicationDTO> update(@PathVariable Long id, @RequestBody PublicationDTO dto) {
+        logger.info("Début mise à jour publication id={}", id);
 
         return publicationRepo.findById(id).map(existing -> {
-            System.out.println("Publication trouvée avant mise à jour : journal='" + existing.getJournal() + "', titre='" + existing.getTitre() + "'");
-
-            System.out.println("Données reçues pour mise à jour : journal='" + dto.getJournal() + "', titre='" + dto.getTitre() + "', annee='" + dto.getAnnee() + "'");
+            logger.info("Publication trouvée avant mise à jour : journal='{}', titre='{}'", existing.getJournal(), existing.getTitre());
 
             existing.setTitre(dto.getTitre());
             existing.setJournal(dto.getJournal());
@@ -177,39 +199,36 @@ public class PublicationController {
             if (dto.getAuteurs() != null) {
                 Set<Auteur> auteurs = new HashSet<>();
                 for (AuteurDTO aDto : dto.getAuteurs()) {
-                    auteurRepo.findById(aDto.getId()).ifPresent(auteurs::add);
+                    Auteur auteur = auteurRepo.findById(aDto.getId())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Auteur non trouvé avec id: " + aDto.getId()));
+                    auteurs.add(auteur);
                 }
                 existing.setAuteurs(auteurs);
-                System.out.println("Mise à jour auteurs, count=" + auteurs.size());
-            } else {
-                System.out.println("Aucun auteur à mettre à jour");
+                logger.info("Mise à jour auteurs, count={}", auteurs.size());
             }
 
             if (dto.getBaseIndexation() != null) {
                 existing.setBaseIndexation(dto.getBaseIndexation());
-                System.out.println("Mise à jour baseIndexation : " + dto.getBaseIndexation());
-            } else {
-                System.out.println("Aucune baseIndexation à mettre à jour");
+                logger.info("Mise à jour baseIndexation : {}", dto.getBaseIndexation());
             }
 
             existing.setStatut(dto.getStatut() != null ? StatutPublication.valueOf(dto.getStatut()) : existing.getStatut());
-            System.out.println("Mise à jour statut : " + existing.getStatut());
+            logger.info("Mise à jour statut : {}", existing.getStatut());
 
             Publication updated = publicationRepo.save(existing);
-            System.out.println("Publication mise à jour en base : journal='" + updated.getJournal() + "', titre='" + updated.getTitre() + "'");
+            logger.info("Publication mise à jour en base : journal='{}', titre='{}'", updated.getJournal(), updated.getTitre());
 
             return ResponseEntity.ok(convertToDTO(updated));
         }).orElseGet(() -> {
-            System.out.println("Publication avec id=" + id + " non trouvée");
+            logger.warn("Publication avec id={} non trouvée", id);
             return ResponseEntity.notFound().build();
         });
     }
 
-
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> delete(@PathVariable(name = "id") Long id) {
-         if (publicationRepo.existsById(id)) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        if (publicationRepo.existsById(id)) {
             publicationRepo.deleteById(id);
             return ResponseEntity.noContent().build();
         } else {
@@ -264,10 +283,15 @@ public class PublicationController {
         if (dto.getAuteurs() != null) {
             Set<Auteur> auteurs = new HashSet<>();
             for (AuteurDTO aDto : dto.getAuteurs()) {
-                auteurRepo.findById(aDto.getId()).ifPresent(auteurs::add);
+                auteurRepo.findById(aDto.getId())
+                    .ifPresentOrElse(
+                        auteurs::add,
+                        () -> logger.warn("Auteur non trouvé en base avec id: {}", aDto.getId())
+                    );
             }
             pub.setAuteurs(auteurs);
         }
         return pub;
     }
+
 }
