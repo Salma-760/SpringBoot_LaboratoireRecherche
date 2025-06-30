@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/utilisateurs")
-@RequiredArgsConstructor
 public class UtilisateurController {
 
     // On utilise maintenant un service pour encapsuler la logique métier

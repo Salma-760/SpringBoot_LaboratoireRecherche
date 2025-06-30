@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 
 @Service
-@RequiredArgsConstructor
 public class AuthService implements UserDetailsService {
 
     private final UtilisateurRepository utilisateurRepository;

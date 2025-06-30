@@ -1,6 +1,8 @@
 package com.example.demo.security;
 
 import io.jsonwebtoken.*;
+
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -43,8 +45,9 @@ public class JwtUtil {
         return (String) extractAllClaims(token).get("role");
     }
 
-    public boolean isTokenValid(String token) {
-        return !isTokenExpired(token);
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractEmail(token);
+        return (username != null && username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
     private boolean isTokenExpired(String token) {

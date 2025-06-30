@@ -79,9 +79,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/livres/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/evenements/**").permitAll()
 
-                // Autres URLs publiques si nécessaire
-                // ...
-
+    
+                .requestMatchers(HttpMethod.POST, "/api/publications/soumettre").hasAnyAuthority("CHERCHEUR", "ADMIN")
+                
                 // Protection API POST/PUT/DELETE uniquement ADMIN
                 .requestMatchers(HttpMethod.POST, "/api/**").hasAuthority("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/**").hasAuthority("ADMIN")
