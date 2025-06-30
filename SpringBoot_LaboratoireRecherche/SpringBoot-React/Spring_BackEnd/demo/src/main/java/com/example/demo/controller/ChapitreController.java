@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/chapitres")
+@RequestMapping("/api/chapitres")
 @CrossOrigin(origins = "http://localhost:3000")
 public class ChapitreController {
 

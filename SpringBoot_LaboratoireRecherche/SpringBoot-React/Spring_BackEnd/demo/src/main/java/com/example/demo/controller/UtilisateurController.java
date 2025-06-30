@@ -22,7 +22,12 @@ public class UtilisateurController {
     // On utilise maintenant un service pour encapsuler la logique métier
     private final UtilisateurService utilisateurService; 
 
-    @GetMapping("/me")
+    public UtilisateurController(UtilisateurService utilisateurService) {
+		super();
+		this.utilisateurService = utilisateurService;
+	}
+
+	@GetMapping("/me")
     public ResponseEntity<UtilisateurDTO> getMonProfil() {
         // C'est beaucoup plus propre et sécurisé d'utiliser le contexte de sécurité
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

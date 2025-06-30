@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from "react"; 
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import {
   Bars3Icon,
@@ -10,7 +10,9 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   CheckBadgeIcon,
+  CalendarDaysIcon
 } from "@heroicons/react/24/outline";
+
 const SidebarAdmin = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -167,6 +169,16 @@ const SidebarAdmin = () => {
           routes={[
             { path: "/admin/directeurs", label: "Liste", Icon: UserGroupIcon },
             { path: "/admin/ajouter-directeur", label: "Ajouter", Icon: PlusCircleIcon },
+          ]}
+        />
+
+        <Section
+          title="Événements"
+          icon={<CalendarDaysIcon className="w-5 h-5" />}
+          basePath="evenements"
+          routes={[
+            { path: "/admin/evenements", label: "Liste", Icon: CalendarDaysIcon },
+            { path: "/admin/ajouter-evenement", label: "Ajouter", Icon: PlusCircleIcon },
           ]}
         />
 

@@ -5,7 +5,8 @@ import PublicLayout from "./layouts/PublicLayout";
 import ProtectedRoute from './components/ProtectedRoute';
 import ChercheurPage from './pages/ChercheurPage';
 import AdminPage from './pages/AdminPage';
-
+import AjouterEvenement from "./pages/AjouterEvenement";
+import ListeEvenements from './pages/ListeEvenements';
 // Pages publiques
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -106,6 +107,8 @@ function App() {
           <Route path="EditDirecteur" element={<EditDirecteur />} />
           <Route path="ListeDirecteurs" element={<ListeDirecteurs />} />
           <Route path="SideBarAdmin" element={<SideBarAdmin />} />
+           <Route path="AjouterEvenement" element={<AjouterEvenement />} />
+           <Route path="ListeEvenements" element={<ListeEvenements />} />
         </Route>
 
         {/* Layout Admin */}

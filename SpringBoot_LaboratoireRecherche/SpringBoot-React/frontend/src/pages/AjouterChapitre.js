@@ -15,7 +15,14 @@ const AjouterChapitre = ({ onChapitreAdded }) => {
   const [selectedAuteurs, setSelectedAuteurs] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8081/api/auteurs")
+    const token = localStorage.getItem("token");
+
+    fetch("http://localhost:8081/api/auteurs", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         const sorted = data.sort((a, b) => a.nom.localeCompare(b.nom));
@@ -40,9 +47,14 @@ const AjouterChapitre = ({ onChapitreAdded }) => {
       auteurs: selectedAuteurs.map((id) => ({ id: parseInt(id) })),
     };
 
+    const token = localStorage.getItem("token");
+
     fetch("http://localhost:8081/api/chapitres", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
       body: JSON.stringify(chapitreData),
     })
       .then((response) => {
@@ -111,7 +123,6 @@ const AjouterChapitre = ({ onChapitreAdded }) => {
         className="w-full p-2 border"
       />
 
-      {/* ✅ Liste des auteurs triée */}
       <label className="block font-semibold">Auteurs</label>
       <select
         multiple

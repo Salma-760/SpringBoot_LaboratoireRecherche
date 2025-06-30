@@ -1,4 +1,3 @@
-// ListeLivres.js
 import React, { useEffect, useState } from "react";
 import AjouterLivre from "./AjouterLivre";
 import EditLivre from "./EditLivre";
@@ -7,22 +6,56 @@ const ListeLivres = () => {
   const [livres, setLivres] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [livreToEdit, setLivreToEdit] = useState(null);
+  const [error, setError] = useState(null);
 
+  // Récupérer le token JWT depuis localStorage
+  const getToken = () => localStorage.getItem("token");
+
+  // Fonction pour récupérer les livres avec le token en header Authorization
   const fetchLivres = () => {
-    fetch("http://localhost:8081/api/livres")
-      .then((res) => res.json())
-      .then((data) => setLivres(data))
-      .catch((err) => console.error("Erreur chargement livres:", err));
+    const token = getToken();
+    fetch("http://localhost:8081/api/livres", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        setLivres(data);
+        setError(null);
+      })
+      .catch((err) => {
+        console.error("Erreur chargement livres:", err);
+        setError("Impossible de charger les livres.");
+        setLivres([]);
+      });
   };
 
   useEffect(() => {
     fetchLivres();
   }, []);
 
+  // Suppression avec token aussi
   const handleDelete = (id) => {
+    const token = getToken();
     fetch(`http://localhost:8081/api/livres/${id}`, {
       method: "DELETE",
-    }).then(() => fetchLivres());
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(`Erreur suppression HTTP ${res.status}`);
+        fetchLivres();
+      })
+      .catch((err) => {
+        console.error("Erreur suppression :", err);
+        alert("Erreur lors de la suppression, voir console.");
+      });
   };
 
   const handleEdit = (livre) => {
@@ -33,6 +66,8 @@ const ListeLivres = () => {
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-4">📘 Liste des livres</h2>
+
+      {error && <p className="text-red-600 mb-4">{error}</p>}
 
       {!showForm && !livreToEdit && (
         <button

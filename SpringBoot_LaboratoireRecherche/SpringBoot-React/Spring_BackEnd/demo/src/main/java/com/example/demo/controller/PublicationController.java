@@ -49,13 +49,10 @@ public class PublicationController {
         logger.info("Recherche de publications avec critères : auteur={}, annee={}, terme={}", auteur, annee, terme);
 
         Specification<Publication> spec = (root, query, cb) -> {
-            // Pour éviter les doublons causés par les jointures, on s'assure que la requête principale est DISTINCT.
-            // On vérifie aussi si la requête de comptage (pour la pagination par ex.) est en cours pour ne pas appliquer le fetch.
             if (query.getResultType() != Long.class && query.getResultType() != long.class) {
-                root.fetch("auteurs", JoinType.LEFT); // C'est la ligne magique qui force le chargement des auteurs.
+                root.fetch("auteurs", JoinType.LEFT);
                 query.distinct(true);
             }
-            // La spécification de base : ne retourner que les publications VALIDÉES.
             return cb.equal(root.get("statut"), StatutPublication.VALIDEE);
         };
 
@@ -63,7 +60,6 @@ public class PublicationController {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("annee"), annee));
         }
         
-        // Logique de recherche OR pour le texte et l'auteur
         Specification<Publication> textSearchSpec = null;
 
         if (terme != null && !terme.trim().isEmpty()) {
@@ -101,7 +97,6 @@ public class PublicationController {
         return pubs.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
-    //Soumission par un Chercheur et admin
     @PostMapping("/soumettre")
     @PreAuthorize("hasAnyRole('CHERCHEUR', 'ADMIN')")
     public ResponseEntity<PublicationDTO> soumettrePublication(@RequestBody PublicationDTO dto, Authentication authentication) {
@@ -115,7 +110,6 @@ public class PublicationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(convertToDTO(saved));
     }
 
-    // ENDPOINTS DE GESTION POUR L'ADMINISTRATEUR
     @GetMapping("/en-attente")
     @PreAuthorize("hasRole('ADMIN')")
     public List<PublicationDTO> getPublicationsEnAttente() {
@@ -152,7 +146,6 @@ public class PublicationController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    //Création directe par un ADMIN
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PublicationDTO> createByAdmin(@RequestBody PublicationDTO dto) {
@@ -164,12 +157,54 @@ public class PublicationController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<PublicationDTO> update(@PathVariable(name = "id") Long id, @RequestBody PublicationDTO dto) {
+    @Transactional
+    public ResponseEntity<PublicationDTO> update(@PathVariable(name="id") Long id, @RequestBody PublicationDTO dto) {
+        System.out.println("Début mise à jour publication id=" + id);
+
         return publicationRepo.findById(id).map(existing -> {
-             Publication updated = publicationRepo.save(existing);
-             return ResponseEntity.ok(convertToDTO(updated));
-        }).orElse(ResponseEntity.notFound().build());
+            System.out.println("Publication trouvée avant mise à jour : journal='" + existing.getJournal() + "', titre='" + existing.getTitre() + "'");
+
+            System.out.println("Données reçues pour mise à jour : journal='" + dto.getJournal() + "', titre='" + dto.getTitre() + "', annee='" + dto.getAnnee() + "'");
+
+            existing.setTitre(dto.getTitre());
+            existing.setJournal(dto.getJournal());
+            existing.setAnnee(dto.getAnnee());
+            existing.setVolume(dto.getVolume());
+            existing.setPages(dto.getPages());
+            existing.setDoi(dto.getDoi());
+            existing.setResume(dto.getResume());
+
+            if (dto.getAuteurs() != null) {
+                Set<Auteur> auteurs = new HashSet<>();
+                for (AuteurDTO aDto : dto.getAuteurs()) {
+                    auteurRepo.findById(aDto.getId()).ifPresent(auteurs::add);
+                }
+                existing.setAuteurs(auteurs);
+                System.out.println("Mise à jour auteurs, count=" + auteurs.size());
+            } else {
+                System.out.println("Aucun auteur à mettre à jour");
+            }
+
+            if (dto.getBaseIndexation() != null) {
+                existing.setBaseIndexation(dto.getBaseIndexation());
+                System.out.println("Mise à jour baseIndexation : " + dto.getBaseIndexation());
+            } else {
+                System.out.println("Aucune baseIndexation à mettre à jour");
+            }
+
+            existing.setStatut(dto.getStatut() != null ? StatutPublication.valueOf(dto.getStatut()) : existing.getStatut());
+            System.out.println("Mise à jour statut : " + existing.getStatut());
+
+            Publication updated = publicationRepo.save(existing);
+            System.out.println("Publication mise à jour en base : journal='" + updated.getJournal() + "', titre='" + updated.getTitre() + "'");
+
+            return ResponseEntity.ok(convertToDTO(updated));
+        }).orElseGet(() -> {
+            System.out.println("Publication avec id=" + id + " non trouvée");
+            return ResponseEntity.notFound().build();
+        });
     }
+
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -182,7 +217,6 @@ public class PublicationController {
         }
     }
 
-    // ENDPOINTS PERSONNELS
     @GetMapping("/mes-publications")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<PublicationDTO>> getMesPublications(Authentication authentication) {
@@ -194,7 +228,6 @@ public class PublicationController {
         return ResponseEntity.ok(dtos);
     }
 
-    // MÉTHODES UTILITAIRES
     private PublicationDTO convertToDTO(Publication pub) {
         PublicationDTO dto = new PublicationDTO();
         dto.setId(pub.getId());

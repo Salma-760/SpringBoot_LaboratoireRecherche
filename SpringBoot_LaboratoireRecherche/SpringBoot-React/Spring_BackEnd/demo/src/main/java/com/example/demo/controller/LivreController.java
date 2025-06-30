@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/livres")
+@RequestMapping("/api/livres")
 @CrossOrigin(origins = "http://localhost:3000")
 public class LivreController {
 
@@ -73,7 +73,7 @@ public class LivreController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<LivreDTO> update(@PathVariable Long id, @RequestBody LivreDTO dto) {
+    public ResponseEntity<LivreDTO> update(@PathVariable(name="id") Long id, @RequestBody LivreDTO dto) {
         return livreRepository.findById(id).map(existingLivre -> {
             existingLivre.setIntituleLivre(dto.getIntituleLivre());
             existingLivre.setIsbn(dto.getIsbn());
@@ -94,7 +94,7 @@ public class LivreController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable(name="id") Long id) {
         if (livreRepository.existsById(id)) {
             livreRepository.deleteById(id);
             return ResponseEntity.noContent().build();

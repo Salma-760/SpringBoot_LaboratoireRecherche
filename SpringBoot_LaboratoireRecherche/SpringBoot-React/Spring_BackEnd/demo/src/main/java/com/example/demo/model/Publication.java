@@ -16,6 +16,7 @@ public class Publication {
     private Long id;
 
     private String titre;
+    @Column(name = "journal")
     private String journal;
     
     @Column(columnDefinition = "TEXT")
@@ -35,7 +36,7 @@ public class Publication {
     @Enumerated(EnumType.STRING)
     private StatutPublication statut;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+   @ManyToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
     @JoinTable(
         name = "publication_auteur",
         joinColumns = @JoinColumn(name = "publication_id"),

@@ -6,20 +6,34 @@ const ListeChapitres = () => {
   const [chapitres, setChapitres] = useState([]);
   const [chapitreToEdit, setChapitreToEdit] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [error, setError] = useState(null);
 
   const fetchChapitres = () => {
-    fetch("http://localhost:8081/api/chapitres")
-      .then((res) => res.json())
+    const token = localStorage.getItem("token");
+
+    fetch("http://localhost:8081/api/chapitres", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Erreur HTTP ${res.status}`);
+        }
+        return res.json();
+      })
       .then((data) => {
         if (Array.isArray(data)) {
           setChapitres(data);
+          setError(null);
         } else {
-          console.error("\u26a0\ufe0f Format invalide :", data);
           setChapitres([]);
+          setError("Format de données inattendu");
         }
       })
       .catch((err) => {
-        console.error("Erreur chargement chapitres :", err);
+        setError("Impossible de charger les chapitres. Vérifiez votre connexion ou authentification.");
         setChapitres([]);
       });
   };
@@ -29,9 +43,24 @@ const ListeChapitres = () => {
   }, []);
 
   const handleDelete = (id) => {
+    const token = localStorage.getItem("token");
+
     fetch(`http://localhost:8081/api/chapitres/${id}`, {
       method: "DELETE",
-    }).then(() => fetchChapitres());
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Erreur HTTP suppression ${res.status}`);
+        }
+        fetchChapitres();
+      })
+      .catch((err) => {
+        alert("Erreur lors de la suppression, voir la console.");
+      });
   };
 
   const handleEdit = (chapitre) => {
@@ -55,6 +84,8 @@ const ListeChapitres = () => {
           {showForm ? "Fermer le formulaire" : "Ajouter un chapitre"}
         </button>
       )}
+
+      {error && <p className="text-red-600 mb-4">{error}</p>}
 
       {showForm && (
         <div className="bg-gray-50 p-4 rounded shadow mb-4">

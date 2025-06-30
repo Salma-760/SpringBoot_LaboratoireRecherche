@@ -17,7 +17,12 @@ public class AuthService implements UserDetailsService {
 
     private final UtilisateurRepository utilisateurRepository;
 
-    @Override
+    public AuthService(UtilisateurRepository utilisateurRepository) {
+		super();
+		this.utilisateurRepository = utilisateurRepository;
+	}
+
+	@Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Utilisateur utilisateur = utilisateurRepository.findByEmail(email);
 

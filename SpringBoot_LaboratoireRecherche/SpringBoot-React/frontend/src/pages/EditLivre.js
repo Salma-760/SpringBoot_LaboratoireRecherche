@@ -10,12 +10,25 @@ const EditLivre = ({ livre, onLivreUpdated, onCancel }) => {
   });
 
   const [auteurs, setAuteurs] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Charger la liste des auteurs
-    fetch("http://localhost:8081/api/auteurs")
-      .then(res => res.json())
-      .then(data => setAuteurs(data));
+    const token = localStorage.getItem("token");
+    // Charger la liste des auteurs avec token
+    fetch("http://localhost:8081/api/auteurs", {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : ""
+      }
+    })
+      .then(res => {
+        if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
+        return res.json();
+      })
+      .then(data => setAuteurs(data))
+      .catch(err => {
+        console.error("Erreur chargement auteurs:", err);
+        setError("Impossible de charger la liste des auteurs.");
+      });
 
     // Initialiser les champs avec les valeurs du livre
     if (livre) {
@@ -40,6 +53,7 @@ const EditLivre = ({ livre, onLivreUpdated, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("token");
     const updatedLivre = {
       ...form,
       auteurs: form.auteurs.map(id => ({ id: parseInt(id) }))
@@ -47,18 +61,30 @@ const EditLivre = ({ livre, onLivreUpdated, onCancel }) => {
 
     fetch(`http://localhost:8081/api/livres/${livre.id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : ""
+      },
       body: JSON.stringify(updatedLivre)
     })
+      .then(res => {
+        if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
+        return res.json();
+      })
       .then(() => {
         onLivreUpdated();
+        setError(null);
       })
-      .catch(err => console.error("Erreur modification livre:", err));
+      .catch(err => {
+        console.error("Erreur modification livre:", err);
+        setError("Erreur lors de la modification du livre.");
+      });
   };
 
   return (
     <div className="bg-yellow-50 p-4 rounded shadow-md">
       <h2 className="text-lg font-bold mb-2">Modifier un livre</h2>
+      {error && <p className="text-red-600 mb-2">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-3">
         <input
           type="text"
@@ -67,6 +93,7 @@ const EditLivre = ({ livre, onLivreUpdated, onCancel }) => {
           value={form.intituleLivre}
           onChange={handleChange}
           className="w-full p-2 border rounded"
+          required
         />
         <input
           type="text"
@@ -83,6 +110,7 @@ const EditLivre = ({ livre, onLivreUpdated, onCancel }) => {
           value={form.maisonEdition}
           onChange={handleChange}
           className="w-full p-2 border rounded"
+          required
         />
         <input
           type="number"
@@ -91,6 +119,7 @@ const EditLivre = ({ livre, onLivreUpdated, onCancel }) => {
           value={form.anneeParution}
           onChange={handleChange}
           className="w-full p-2 border rounded"
+          required
         />
 
         <label className="block font-semibold">Auteurs</label>
@@ -99,6 +128,7 @@ const EditLivre = ({ livre, onLivreUpdated, onCancel }) => {
           value={form.auteurs}
           onChange={handleAuteurChange}
           className="w-full border px-3 py-2 rounded"
+          required
         >
           {auteurs.map((a) => (
             <option key={a.id} value={a.id}>

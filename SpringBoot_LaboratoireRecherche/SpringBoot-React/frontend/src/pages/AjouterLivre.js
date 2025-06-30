@@ -10,12 +10,24 @@ const AjouterLivre = ({ onLivreAdded, onCancel }) => {
   });
 
   const [auteurs, setAuteurs] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:8081/api/auteurs")
-      .then((res) => res.json())
+    const token = localStorage.getItem("token");
+    fetch("http://localhost:8081/api/auteurs", {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
+        return res.json();
+      })
       .then((data) => setAuteurs(data))
-      .catch((err) => console.error("Erreur chargement auteurs:", err));
+      .catch((err) => {
+        console.error("Erreur chargement auteurs:", err);
+        setError("Impossible de charger la liste des auteurs.");
+      });
   }, []);
 
   const handleChange = (e) => {
@@ -30,6 +42,7 @@ const AjouterLivre = ({ onLivreAdded, onCancel }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const token = localStorage.getItem("token");
     const livreData = {
       ...form,
       auteurs: form.auteurs.map((id) => ({ id: parseInt(id) })),
@@ -37,9 +50,16 @@ const AjouterLivre = ({ onLivreAdded, onCancel }) => {
 
     fetch("http://localhost:8081/api/livres", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
       body: JSON.stringify(livreData),
     })
+      .then((res) => {
+        if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
+        return res.json();
+      })
       .then(() => {
         onLivreAdded();
         setForm({
@@ -49,13 +69,18 @@ const AjouterLivre = ({ onLivreAdded, onCancel }) => {
           anneeParution: "",
           auteurs: [],
         });
+        setError(null);
       })
-      .catch((err) => console.error("Erreur ajout livre:", err));
+      .catch((err) => {
+        console.error("Erreur ajout livre:", err);
+        setError("Échec de l'ajout du livre.");
+      });
   };
 
   return (
     <div className="bg-gray-50 p-4 rounded shadow-md">
       <h2 className="text-lg font-bold mb-2">Ajouter un livre</h2>
+      {error && <p className="text-red-600 mb-2">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-3">
         <input
           type="text"
@@ -64,6 +89,7 @@ const AjouterLivre = ({ onLivreAdded, onCancel }) => {
           value={form.intituleLivre}
           onChange={handleChange}
           className="w-full p-2 border rounded"
+          required
         />
         <input
           type="text"
@@ -80,6 +106,7 @@ const AjouterLivre = ({ onLivreAdded, onCancel }) => {
           value={form.maisonEdition}
           onChange={handleChange}
           className="w-full p-2 border rounded"
+          required
         />
         <input
           type="number"
@@ -88,6 +115,7 @@ const AjouterLivre = ({ onLivreAdded, onCancel }) => {
           value={form.anneeParution}
           onChange={handleChange}
           className="w-full p-2 border rounded"
+          required
         />
 
         <label className="block font-semibold">Auteurs</label>
@@ -96,6 +124,7 @@ const AjouterLivre = ({ onLivreAdded, onCancel }) => {
           value={form.auteurs}
           onChange={handleAuteurChange}
           className="w-full border px-3 py-2 rounded"
+          required
         >
           {auteurs.map((a) => (
             <option key={a.id} value={a.id}>

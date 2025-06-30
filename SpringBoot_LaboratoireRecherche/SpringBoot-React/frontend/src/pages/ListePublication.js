@@ -102,7 +102,13 @@ const ListePublications = () => {
               <p><span className="font-semibold">Année:</span> {pub.annee}</p>
               <p><span className="font-semibold">Volume:</span> {pub.volume} | <span className="font-semibold">Pages:</span> {pub.pages}</p>
               <p><span className="font-semibold">DOI:</span> {pub.doi}</p>
-              <p><span className="font-semibold">Auteurs:</span> {Array.isArray(pub.auteurs) ? pub.auteurs.map(a => a.nom).join(", ") : ""}</p>
+              <p><span className="font-semibold">Résumé:</span> {pub.resume}</p>
+              <p><span className="font-semibold">Statut:</span> {pub.statut}</p>
+              <p>
+  <span className="font-semibold">Auteurs:</span>{" "}
+  {Array.isArray(pub.auteurs) ? pub.auteurs.map(a => `${a.prenom} ${a.nom}`).join(", ") : ""}
+</p>
+
 
               <div className="flex justify-end gap-2 mt-4">
                 <button

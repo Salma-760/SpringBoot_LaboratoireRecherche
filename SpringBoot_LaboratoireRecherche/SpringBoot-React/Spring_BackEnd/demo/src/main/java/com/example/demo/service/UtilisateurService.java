@@ -15,7 +15,12 @@ public class UtilisateurService {
 
  private final UtilisateurRepository utilisateurRepository;
 
- // Méthode pour GET /me
+ public UtilisateurService(UtilisateurRepository utilisateurRepository) {
+	super();
+	this.utilisateurRepository = utilisateurRepository;
+}
+
+// Méthode pour GET /me
  @Transactional(readOnly = true)
  public UtilisateurDTO getUtilisateurDTOByEmail(String email) {
      Utilisateur user = utilisateurRepository.findByEmail(email);
