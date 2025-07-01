@@ -107,8 +107,8 @@ function App() {
           <Route path="EditDirecteur" element={<EditDirecteur />} />
           <Route path="ListeDirecteurs" element={<ListeDirecteurs />} />
           <Route path="SideBarAdmin" element={<SideBarAdmin />} />
-           <Route path="AjouterEvenement" element={<AjouterEvenement />} />
-           <Route path="ListeEvenements" element={<ListeEvenements />} />
+          <Route path="ListeEvenements" element={<ListeEvenements />} />
+          <Route path="ajouter-evenement" element={<AjouterEvenement />} />
         </Route>
 
         {/* Layout Admin */}
@@ -118,6 +118,8 @@ function App() {
             <AdminPage />
           }
         >
+          <Route path="ListeEvenements" element={<ListeEvenements />} />
+          <Route path="ajouter-evenement" element={<AjouterEvenement />} />
           <Route index element={<Navigate to="publications" />} />
           {/* Publications */}
           <Route path="publications" element={<ListePublication />} />
@@ -154,6 +156,9 @@ function App() {
           <Route path="directeurs" element={<ListeDirecteurs />} />
           <Route path="ajouter-directeur" element={<AjouterDirecteur />} />
           <Route path="modifier-directeur/:id" element={<EditDirecteur />} />
+
+          
+         
         </Route>
 
         {/* Layout Chercheur */}

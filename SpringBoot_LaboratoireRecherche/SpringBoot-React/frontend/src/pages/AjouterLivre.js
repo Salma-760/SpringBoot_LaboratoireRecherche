@@ -14,19 +14,16 @@ const AjouterLivre = ({ onLivreAdded, onCancel }) => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    console.log("Chargement auteurs avec token:", token);
     fetch("http://localhost:8081/api/auteurs", {
       headers: {
         Authorization: token ? `Bearer ${token}` : "",
       },
     })
       .then((res) => {
-        console.log("Réponse fetch auteurs:", res);
         if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
         return res.json();
       })
       .then((data) => {
-        console.log("Auteurs reçus:", data);
         setAuteurs(data);
         setError(null);
       })
@@ -36,9 +33,8 @@ const AjouterLivre = ({ onLivreAdded, onCancel }) => {
       });
   }, []);
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const handleAuteurChange = (e) => {
     const selected = [...e.target.selectedOptions].map((opt) => opt.value);
@@ -47,14 +43,12 @@ const AjouterLivre = ({ onLivreAdded, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const token = localStorage.getItem("token");
-    const livreData = {
-      ...form,
-      auteurs: form.auteurs.map((id) => ({ id: parseInt(id) })),
-    };
 
-    console.log("Envoi de ce livre :", livreData);
+    const livreData = {
+  ...form,
+  auteursDTO: form.auteurs.map((id) => ({ id: parseInt(id) })), // ✅ attention au nom du champ !
+};
 
     fetch("http://localhost:8081/api/livres", {
       method: "POST",
@@ -65,13 +59,14 @@ const AjouterLivre = ({ onLivreAdded, onCancel }) => {
       body: JSON.stringify(livreData),
     })
       .then((res) => {
-        console.log("Réponse du serveur:", res);
         if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
         return res.json();
       })
       .then((data) => {
-        console.log("Livre ajouté avec succès :", data);
-        onLivreAdded();
+        console.log("Livre ajouté:", data);
+        if (typeof onLivreAdded === "function") {
+          onLivreAdded(); // appelle la fonction du parent
+        }
         setForm({
           intituleLivre: "",
           isbn: "",

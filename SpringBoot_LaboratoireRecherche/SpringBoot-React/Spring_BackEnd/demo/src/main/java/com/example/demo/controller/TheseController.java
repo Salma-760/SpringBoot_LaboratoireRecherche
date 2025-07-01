@@ -17,7 +17,7 @@ import com.example.demo.repository.DirecteurRepository;
 import com.example.demo.repository.TheseRepository;
 
 @RestController
-@RequestMapping("/theses")
+@RequestMapping("/api/theses")
 @CrossOrigin(origins = "http://localhost:3000")
 public class TheseController {
 

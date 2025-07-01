@@ -15,7 +15,7 @@ import com.example.demo.model.Directeur;
 import com.example.demo.repository.DirecteurRepository;
 
 @RestController
-@RequestMapping("/directeurs")
+@RequestMapping("api/directeurs")
 @CrossOrigin(origins = "http://localhost:3000")
 public class DirecteurController {
 

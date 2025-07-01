@@ -1,21 +1,30 @@
 import React, { useEffect, useState } from "react";
 
 const EditThese = ({ these, onTheseUpdated, onCancel }) => {
-  // On initialise form avec un objet plat, on met directeurs sous forme de tableau d'IDs
+  const token = localStorage.getItem("token");
+
   const [form, setForm] = useState({
     ...these,
     directeurs: these.directeurs ? these.directeurs.map((d) => d.id.toString()) : [],
   });
+
   const [directeurs, setDirecteurs] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8081/api/directeurs")
-      .then((res) => res.json())
+    fetch("http://localhost:8081/api/directeurs", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Erreur chargement directeurs");
+        return res.json();
+      })
       .then((data) => setDirecteurs(data))
       .catch((err) => console.error("Erreur chargement directeurs:", err));
-  }, []);
+  }, [token]);
 
-  // Au cas où la prop "these" change, on synchronise form.directeurs
   useEffect(() => {
     setForm({
       ...these,
@@ -35,7 +44,6 @@ const EditThese = ({ these, onTheseUpdated, onCancel }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // On reconstruit la liste des directeurs sous forme d'objets {id: x}
     const updatedData = {
       ...form,
       directeurs: form.directeurs.map((id) => ({ id: parseInt(id) })),
@@ -43,10 +51,16 @@ const EditThese = ({ these, onTheseUpdated, onCancel }) => {
 
     fetch(`http://localhost:8081/api/theses/${form.id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
       body: JSON.stringify(updatedData),
     })
-      .then(() => onTheseUpdated())
+      .then((res) => {
+        if (!res.ok) throw new Error("Erreur mise à jour thèse");
+        onTheseUpdated();
+      })
       .catch((err) => console.error("Erreur maj thèse:", err));
   };
 
@@ -54,7 +68,6 @@ const EditThese = ({ these, onTheseUpdated, onCancel }) => {
     <div className="bg-yellow-50 p-4 rounded shadow-md">
       <h2 className="text-lg font-bold mb-2">Modifier une thèse</h2>
       <form onSubmit={handleSubmit} className="space-y-3">
-        {/* Champs texte */}
         <input
           type="text"
           name="nomDoctorant"
@@ -98,17 +111,15 @@ const EditThese = ({ these, onTheseUpdated, onCancel }) => {
         <input
           type="date"
           name="dateSoutenance"
-          placeholder="Date de soutenance"
           value={form.dateSoutenance || ""}
           onChange={handleChange}
           className="w-full p-2 border rounded"
         />
 
-        {/* Sélecteur multiple des directeurs */}
         <label className="block font-semibold">Directeurs</label>
         <select
           multiple
-          value={form.directeurs || []} // tableau d'IDs string
+          value={form.directeurs || []}
           onChange={handleDirecteurChange}
           className="w-full border px-3 py-2 rounded"
         >

@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Auteur;
 import com.example.demo.model.Chapitre;
+import com.example.demo.repository.AuteurRepository;
 import com.example.demo.repository.ChapitreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,9 @@ public class ChapitreController {
     @Autowired
     private ChapitreRepository chapitreRepository;
 
+    @Autowired
+    private AuteurRepository auteurRepository;
+
     @GetMapping
     public List<Chapitre> getAll() {
         return chapitreRepository.findAll();
@@ -25,9 +29,13 @@ public class ChapitreController {
 
     @PostMapping
     public Chapitre add(@RequestBody Chapitre chapitre) {
-        // ✅ Supprimer les doublons d’auteurs s’il y en a
-        Set<Auteur> auteursUniques = new HashSet<>(chapitre.getAuteurs());
-        chapitre.setAuteurs(auteursUniques);
+        // ✅ Charger les auteurs existants depuis la base
+        Set<Auteur> auteursExistants = new HashSet<>();
+        for (Auteur auteur : chapitre.getAuteurs()) {
+            auteurRepository.findById(auteur.getId()).ifPresent(auteursExistants::add);
+        }
+        chapitre.setAuteurs(auteursExistants);
+
         return chapitreRepository.save(chapitre);
     }
 
@@ -42,9 +50,12 @@ public class ChapitreController {
             c.setPageDebut(ch.getPageDebut());
             c.setPageFin(ch.getPageFin());
 
-            // ✅ Supprimer les doublons ici aussi
-            Set<Auteur> auteursUniques = new HashSet<>(ch.getAuteurs());
-            c.setAuteurs(auteursUniques);
+            // ✅ Recharger les bons auteurs depuis la base
+            Set<Auteur> auteursExistants = new HashSet<>();
+            for (Auteur auteur : ch.getAuteurs()) {
+                auteurRepository.findById(auteur.getId()).ifPresent(auteursExistants::add);
+            }
+            c.setAuteurs(auteursExistants);
 
             return chapitreRepository.save(c);
         }).orElse(null);

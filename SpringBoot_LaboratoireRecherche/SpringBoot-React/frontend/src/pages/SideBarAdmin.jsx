@@ -177,8 +177,8 @@ const SidebarAdmin = () => {
           icon={<CalendarDaysIcon className="w-5 h-5" />}
           basePath="evenements"
           routes={[
-            { path: "/admin/evenements", label: "Liste", Icon: CalendarDaysIcon },
-            { path: "/admin/ajouter-evenement", label: "Ajouter", Icon: PlusCircleIcon },
+            { path: "admin/ListeEvenements", label: "Liste", Icon: CalendarDaysIcon },
+            { path: "/admin/ajouter-Evenement", label: "Ajouter", Icon: PlusCircleIcon },
           ]}
         />
 

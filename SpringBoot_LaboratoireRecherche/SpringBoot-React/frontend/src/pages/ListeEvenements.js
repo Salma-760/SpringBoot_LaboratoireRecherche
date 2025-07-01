@@ -40,7 +40,7 @@ const ListeEvenements = () => {
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
       <h1 className="text-2xl font-bold text-center text-blue-800 mb-6">
-        📆 Événements à venir
+      Nos Evenements
       </h1>
 
       <div className="space-y-4">

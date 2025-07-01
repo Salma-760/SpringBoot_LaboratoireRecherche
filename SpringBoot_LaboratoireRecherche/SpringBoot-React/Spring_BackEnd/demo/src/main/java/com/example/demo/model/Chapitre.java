@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
@@ -27,6 +28,8 @@ public class Chapitre {
         joinColumns = @JoinColumn(name = "chapitre_id"),
         inverseJoinColumns = @JoinColumn(name = "auteur_id")
     )
+    
+    @JsonIgnoreProperties({"publications", "chapitres"})
     private Set<Auteur> auteurs;
     public Chapitre() {
         

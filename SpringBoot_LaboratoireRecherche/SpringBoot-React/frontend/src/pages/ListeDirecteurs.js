@@ -6,11 +6,19 @@ const ListeDirecteurs = () => {
   const [directeurs, setDirecteurs] = useState([]);
   const [directeurToEdit, setDirecteurToEdit] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [error, setError] = useState(null);
 
   const fetchDirecteurs = () => {
     fetch("http://localhost:8081/api/directeurs")
-      .then((res) => res.json())
-      .then((data) => setDirecteurs(data));
+      .then((res) => {
+        if (!res.ok) throw new Error("Erreur chargement directeurs");
+        return res.json();
+      })
+      .then((data) => setDirecteurs(data))
+      .catch((err) => {
+        console.error("Erreur récupération :", err);
+        setError("Impossible de charger les directeurs.");
+      });
   };
 
   useEffect(() => {
@@ -18,14 +26,27 @@ const ListeDirecteurs = () => {
   }, []);
 
   const handleDelete = (id) => {
+    if (!window.confirm("Confirmer la suppression ?")) return;
+
     fetch(`http://localhost:8081/api/directeurs/${id}`, {
       method: "DELETE",
-    }).then(() => fetchDirecteurs());
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Échec de la suppression");
+        fetchDirecteurs();
+      })
+      .catch((err) => {
+        console.error("Erreur suppression :", err);
+        setError("Échec de la suppression du directeur.");
+      });
   };
 
   return (
     <div className="p-4">
       <h2 className="text-2xl font-bold mb-4">Liste des directeurs</h2>
+
+      {error && <p className="text-red-600 mb-4">{error}</p>}
+
       {!showForm && !directeurToEdit && (
         <button
           onClick={() => setShowForm(true)}
@@ -73,11 +94,15 @@ const ListeDirecteurs = () => {
                 <button
                   onClick={() => setDirecteurToEdit(d)}
                   className="bg-yellow-400 px-2 py-1 rounded"
-                >Modifier</button>
+                >
+                  Modifier
+                </button>
                 <button
                   onClick={() => handleDelete(d.id)}
                   className="bg-red-500 text-white px-2 py-1 rounded"
-                >Supprimer</button>
+                >
+                  Supprimer
+                </button>
               </td>
             </tr>
           ))}

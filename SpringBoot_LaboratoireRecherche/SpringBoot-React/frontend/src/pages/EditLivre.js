@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 
 const EditLivre = ({ livre, onLivreUpdated, onCancel }) => {
-  // Initialiser le formulaire avec les valeurs du livre passé en props
   const [form, setForm] = useState({
     intituleLivre: livre.intituleLivre || "",
     isbn: livre.isbn || "",
@@ -13,7 +12,6 @@ const EditLivre = ({ livre, onLivreUpdated, onCancel }) => {
   const [auteurs, setAuteurs] = useState([]);
   const [error, setError] = useState(null);
 
-  // Charger la liste des auteurs disponibles pour la sélection
   useEffect(() => {
     const token = localStorage.getItem("token");
     fetch("http://localhost:8081/api/auteurs", {
@@ -32,30 +30,26 @@ const EditLivre = ({ livre, onLivreUpdated, onCancel }) => {
       });
   }, []);
 
-  // Met à jour l'état du formulaire au changement des champs
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Gestion de la sélection multiple des auteurs
   const handleAuteurChange = (e) => {
     const selected = [...e.target.selectedOptions].map((opt) => opt.value);
     setForm({ ...form, auteurs: selected });
   };
 
-  // Soumission du formulaire pour mettre à jour le livre
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const token = localStorage.getItem("token");
 
-    // Préparer l'objet à envoyer, auteurs en tableau d'IDs numériques
     const livreData = {
       intituleLivre: form.intituleLivre,
       isbn: form.isbn,
       maisonEdition: form.maisonEdition,
       anneeParution: parseInt(form.anneeParution, 10),
-      auteursIds: form.auteurs.map((id) => parseInt(id, 10)),
+      auteursDTO: form.auteurs.map((id) => ({ id: parseInt(id, 10) })), // ✅ Correction ici
     };
 
     fetch(`http://localhost:8081/api/livres/${livre.id}`, {
@@ -71,7 +65,7 @@ const EditLivre = ({ livre, onLivreUpdated, onCancel }) => {
         return res.json();
       })
       .then(() => {
-        onLivreUpdated(); // callback pour rafraîchir la liste
+        onLivreUpdated();
         setError(null);
       })
       .catch((err) => {

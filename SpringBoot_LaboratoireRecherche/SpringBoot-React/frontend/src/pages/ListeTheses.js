@@ -8,9 +8,18 @@ const ListeTheses = () => {
   const [theseToEdit, setTheseToEdit] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
+  const token = localStorage.getItem("token");
+
   const fetchTheses = () => {
-    fetch("http://localhost:8081/api/theses")
-      .then((res) => res.json())
+    fetch("http://localhost:8081/api/theses", {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Erreur lors du chargement");
+        return res.json();
+      })
       .then((data) => {
         if (Array.isArray(data)) {
           setTheses(data);
@@ -24,7 +33,12 @@ const ListeTheses = () => {
   }, []);
 
   const handleDelete = (id) => {
-    fetch(`http://localhost:8081/api/theses/${id}`, { method: "DELETE" })
+    fetch(`http://localhost:8081/api/theses/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    })
       .then(() => fetchTheses())
       .catch((err) => console.error("Erreur suppression :", err));
   };
@@ -92,7 +106,9 @@ const ListeTheses = () => {
         <tbody>
           {theses.map((t) => (
             <tr key={t.id} className="text-center">
-              <td className="border border-gray-300 p-2">{t.nomDoctorant} {t.prenomDoctorant}</td>
+              <td className="border border-gray-300 p-2">
+                {t.nomDoctorant} {t.prenomDoctorant}
+              </td>
               <td className="border border-gray-300 p-2">{t.titreThese}</td>
               <td className="border border-gray-300 p-2">{t.specialite}</td>
               <td className="border border-gray-300 p-2">{t.anneeUniversitaire}</td>
@@ -105,22 +121,18 @@ const ListeTheses = () => {
                 )}
               </td>
               <td className="border border-gray-300 p-2 flex justify-center gap-4">
-                {/* Bouton Modifier */}
                 <button
                   onClick={() => setTheseToEdit(t)}
                   aria-label="Modifier"
-                  className="flex items-center gap-2 bg-blue-400 hover:bg-blue-500 text-white px-4 py-2 rounded transition-transform active:scale-95 select-none"
-                  type="button"
+                  className="flex items-center gap-2 bg-blue-400 hover:bg-blue-500 text-white px-4 py-2 rounded"
                 >
                   <PencilSquareIcon className="h-5 w-5" />
                   Modifier
                 </button>
-                {/* Bouton Supprimer */}
                 <button
                   onClick={() => handleDelete(t.id)}
                   aria-label="Supprimer"
-                  className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded transition-transform active:scale-95 select-none"
-                  type="button"
+                  className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded"
                 >
                   <TrashIcon className="h-5 w-5" />
                   Supprimer

@@ -14,8 +14,14 @@ const AjouterThese = ({ onTheseAdded, onCancel }) => {
   const [directeurs, setDirecteurs] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
 
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
-    fetch("http://localhost:8081/api/directeurs")
+    fetch("http://localhost:8081/api/directeurs", {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setDirecteurs(data);
@@ -46,10 +52,14 @@ const AjouterThese = ({ onTheseAdded, onCancel }) => {
 
     fetch("http://localhost:8081/api/theses", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
       body: JSON.stringify(theseData),
     })
-      .then(() => {
+      .then((res) => {
+        if (!res.ok) throw new Error("Erreur lors de l'ajout de la thèse");
         setSuccessMessage("✅ Thèse ajoutée avec succès !");
         onTheseAdded();
         setForm({

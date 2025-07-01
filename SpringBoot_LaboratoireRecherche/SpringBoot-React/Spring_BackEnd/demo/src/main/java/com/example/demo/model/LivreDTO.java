@@ -64,5 +64,16 @@ public class LivreDTO {
 		this.anneeParution = anneeParution;
 	}
 
+	public LivreDTO(Long id, String intituleLivre, String isbn, String maisonEdition, int anneeParution,
+			Set<AuteurDTO> auteursDTO) {
+		super();
+		this.id = id;
+		this.intituleLivre = intituleLivre;
+		this.isbn = isbn;
+		this.maisonEdition = maisonEdition;
+		this.anneeParution = anneeParution;
+		this.auteursDTO = auteursDTO;
+	}
+    
     // autres getters/setters...
 }

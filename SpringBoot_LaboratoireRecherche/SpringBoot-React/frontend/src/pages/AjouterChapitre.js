@@ -1,148 +1,165 @@
 import React, { useEffect, useState } from "react";
 
 const AjouterChapitre = ({ onChapitreAdded }) => {
-  const [form, setForm] = useState({
+  const [auteursDisponibles, setAuteursDisponibles] = useState([]);
+  const [selectedAuteurIds, setSelectedAuteurIds] = useState([]);
+  const [formData, setFormData] = useState({
     intituleChapitre: "",
     titreLivre: "",
     isbn: "",
     maisonEdition: "",
     anneePublication: "",
     pageDebut: "",
-    pageFin: "",
+    pageFin: ""
   });
 
-  const [auteurs, setAuteurs] = useState([]);
-  const [selectedAuteurs, setSelectedAuteurs] = useState([]);
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
     fetch("http://localhost:8081/api/auteurs", {
       headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
-      },
+        Authorization: `Bearer ${token}`
+      }
     })
       .then((res) => res.json())
-      .then((data) => {
-        const sorted = data.sort((a, b) => a.nom.localeCompare(b.nom));
-        setAuteurs(sorted);
-      })
-      .catch((err) => console.error("Erreur chargement auteurs :", err));
+      .then((data) => setAuteursDisponibles(data))
+      .catch((err) => console.error("Erreur chargement auteurs:", err));
   }, []);
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
 
-  const handleAuteurChange = (e) => {
-    const selectedIds = [...e.target.selectedOptions].map((opt) => opt.value);
-    setSelectedAuteurs(selectedIds);
+  const handleAuteurSelection = (e) => {
+    const options = e.target.options;
+    const selected = [];
+    for (let i = 0; i < options.length; i++) {
+      if (options[i].selected) {
+        selected.push(parseInt(options[i].value));
+      }
+    }
+    setSelectedAuteurIds(selected);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const chapitreData = {
-      ...form,
-      auteurs: selectedAuteurs.map((id) => ({ id: parseInt(id) })),
-    };
+    const auteursSelectionnes = auteursDisponibles
+      .filter((a) => selectedAuteurIds.includes(a.id))
+      .map((a) => ({ id: a.id }));
 
-    const token = localStorage.getItem("token");
+    const chapitre = {
+      ...formData,
+      anneePublication: parseInt(formData.anneePublication),
+      pageDebut: parseInt(formData.pageDebut),
+      pageFin: parseInt(formData.pageFin),
+      auteurs: auteursSelectionnes
+    };
 
     fetch("http://localhost:8081/api/chapitres", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify(chapitreData),
+      body: JSON.stringify(chapitre)
     })
-      .then((response) => {
-        if (!response.ok) throw new Error("Erreur lors de l'ajout");
-        alert("✅ Chapitre ajouté avec succès !");
-        if (onChapitreAdded) onChapitreAdded();
+      .then((res) => {
+        if (!res.ok) throw new Error("Erreur HTTP " + res.status);
+        return res.json();
+      })
+      .then((data) => {
+        console.log("✅ Chapitre ajouté:", data);
+        onChapitreAdded();
       })
       .catch((err) => {
-        console.error("Erreur ajout chapitre :", err);
-        alert("❌ Échec de l'ajout du chapitre.");
+        console.error("❌ Erreur ajout chapitre:", err.message);
+        alert("Erreur lors de l'ajout du chapitre");
       });
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-2 bg-gray-100 p-4 rounded shadow"
-    >
+    <form onSubmit={handleSubmit} className="space-y-4">
       <input
+        type="text"
         name="intituleChapitre"
         placeholder="Intitulé du chapitre"
+        value={formData.intituleChapitre}
         onChange={handleChange}
-        className="w-full p-2 border"
+        className="border p-2 w-full rounded"
         required
       />
       <input
+        type="text"
         name="titreLivre"
         placeholder="Titre du livre"
+        value={formData.titreLivre}
         onChange={handleChange}
-        className="w-full p-2 border"
-        required
+        className="border p-2 w-full rounded"
       />
       <input
+        type="text"
         name="isbn"
         placeholder="ISBN"
+        value={formData.isbn}
         onChange={handleChange}
-        className="w-full p-2 border"
+        className="border p-2 w-full rounded"
       />
       <input
+        type="text"
         name="maisonEdition"
-        placeholder="Maison d’édition"
+        placeholder="Maison d'édition"
+        value={formData.maisonEdition}
         onChange={handleChange}
-        className="w-full p-2 border"
-        required
+        className="border p-2 w-full rounded"
       />
       <input
+        type="number"
         name="anneePublication"
-        placeholder="Année"
-        type="number"
+        placeholder="Année de publication"
+        value={formData.anneePublication}
         onChange={handleChange}
-        className="w-full p-2 border"
-        required
+        className="border p-2 w-full rounded"
       />
       <input
+        type="number"
         name="pageDebut"
-        placeholder="Page de début"
-        type="number"
+        placeholder="Page début"
+        value={formData.pageDebut}
         onChange={handleChange}
-        className="w-full p-2 border"
+        className="border p-2 w-full rounded"
       />
       <input
-        name="pageFin"
-        placeholder="Page de fin"
         type="number"
+        name="pageFin"
+        placeholder="Page fin"
+        value={formData.pageFin}
         onChange={handleChange}
-        className="w-full p-2 border"
+        className="border p-2 w-full rounded"
       />
 
-      <label className="block font-semibold">Auteurs</label>
+      <label className="block font-semibold">Auteurs :</label>
       <select
         multiple
-        value={selectedAuteurs}
-        onChange={handleAuteurChange}
-        className="w-full border px-3 py-2 rounded"
+        onChange={handleAuteurSelection}
+        className="border p-2 w-full rounded h-32"
         required
       >
-        {auteurs.map((auteur) => (
-          <option key={auteur.id} value={auteur.id}>
-            {auteur.nom} {auteur.prenom}
+        {auteursDisponibles.map((a) => (
+          <option key={a.id} value={a.id}>
+            {a.prenom} {a.nom}
           </option>
         ))}
       </select>
 
       <button
         type="submit"
-        className="bg-green-600 text-white px-4 py-2 rounded mt-2"
+        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
       >
-        Ajouter
+        Ajouter Chapitre
       </button>
     </form>
   );
