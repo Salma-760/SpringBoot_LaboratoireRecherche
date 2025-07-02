@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import AuteurForm from "./AjouterAuteur";
 import AuteurModifier from "./EditAuteur";
+import {
+  UserIcon,
+  EnvelopeIcon,
+  PencilIcon,
+  TrashIcon,
+} from "@heroicons/react/24/solid";
 
 const ListeAuteurs = () => {
   const [auteurs, setAuteurs] = useState([]);
@@ -9,7 +15,7 @@ const ListeAuteurs = () => {
   const [error, setError] = useState(null);
 
   const fetchAuteurs = () => {
-    const token = localStorage.getItem("token"); // ou selon où tu stockes le JWT
+    const token = localStorage.getItem("token");
 
     fetch("http://localhost:8081/api/auteurs", {
       headers: {
@@ -18,19 +24,18 @@ const ListeAuteurs = () => {
       },
     })
       .then((res) => {
-        if (!res.ok) {
-          throw new Error(`Erreur HTTP ${res.status}`);
-        }
+        if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
         return res.json();
       })
       .then((data) => {
-        console.log("Données auteurs reçues :", data);
         setAuteurs(data);
         setError(null);
       })
       .catch((err) => {
         console.error("Erreur chargement auteurs :", err);
-        setError("Impossible de charger les auteurs. Veuillez vérifier votre connexion ou authentification.");
+        setError(
+          "Impossible de charger les auteurs. Veuillez vérifier votre connexion ou authentification."
+        );
       });
   };
 
@@ -59,7 +64,7 @@ const ListeAuteurs = () => {
 
   const handleEdit = (auteur) => {
     setAuteurToEdit(auteur);
-    setShowFormAjout(false); // cacher formulaire d'ajout
+    setShowFormAjout(false);
   };
 
   const handleCancelEdit = () => {
@@ -67,15 +72,15 @@ const ListeAuteurs = () => {
   };
 
   const handleAddClick = () => {
-    setShowFormAjout(!showFormAjout); // toggle
-    setAuteurToEdit(null); // annuler modification si en cours
+    setShowFormAjout(!showFormAjout);
+    setAuteurToEdit(null);
   };
 
   return (
-    <div className="p-4">
+    <div className="p-6">
       <button
         onClick={handleAddClick}
-        className="mb-4 bg-blue-500 text-white px-4 py-2 rounded"
+        className="mb-4 bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
       >
         {showFormAjout ? "Fermer le formulaire" : "➕ Ajouter un auteur"}
       </button>
@@ -102,34 +107,49 @@ const ListeAuteurs = () => {
         />
       )}
 
-      <h2 className="text-2xl mt-6 mb-3">Liste des auteurs</h2>
-      <ul className="space-y-2">
+      <h2 className="text-3xl font-bold mb-6 flex items-center gap-2">
+        <UserIcon className="w-8 h-8 text-red-600" />
+        Liste des Auteurs
+      </h2>
+
+      <div className="flex flex-wrap gap-6">
         {auteurs.map((a) => (
-          <li
+          <div
             key={a.id}
-            className="flex justify-between items-center bg-white p-3 border rounded shadow"
+            className="w-[340px] bg-white border rounded-lg shadow-md p-5 space-y-3"
           >
-            <div>
-              <strong>{a.nom} {a.prenom}</strong><br />
-              {a.email}
+            <div className="flex items-center gap-3">
+              <UserIcon className="w-7 h-7 text-red-600" />
+              <div>
+                <p className="text-lg font-semibold text-gray-800">{a.nom}</p>
+                <p className="text-lg font-semibold text-gray-800">{a.prenom}</p>
+              </div>
             </div>
-            <div className="flex gap-2">
+
+            <div className="flex items-center gap-2">
+              <EnvelopeIcon className="w-6 h-6 text-gray-600" />
+              <p className="text-sm text-gray-700">{a.email}</p>
+            </div>
+
+            <div className="flex gap-3 pt-2">
               <button
                 onClick={() => handleEdit(a)}
-                className="bg-yellow-400 text-black px-3 py-1 rounded"
+                className="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-1.5 rounded font-medium flex items-center gap-2"
               >
+                <PencilIcon className="w-4 h-4" />
                 Modifier
               </button>
               <button
                 onClick={() => deleteAuteur(a.id)}
-                className="bg-red-500 text-white px-3 py-1 rounded"
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded font-medium flex items-center gap-2"
               >
+                <TrashIcon className="w-4 h-4" />
                 Supprimer
               </button>
             </div>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react"; 
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import {
   Bars3Icon,
@@ -10,7 +10,7 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   CheckBadgeIcon,
-  CalendarDaysIcon
+  CalendarDaysIcon,
 } from "@heroicons/react/24/outline";
 
 const SidebarAdmin = () => {
@@ -18,13 +18,37 @@ const SidebarAdmin = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(true);
   const [openSections, setOpenSections] = useState({});
+  const [admin, setAdmin] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/");
+      return;
+    }
+
+    fetch("/api/utilisateurs/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Unauthorized");
+        return res.json();
+      })
+      .then((data) => setAdmin(data))
+      .catch((err) => {
+        console.error("Erreur de session admin :", err);
+        localStorage.clear();
+        navigate("/");
+      });
+  }, [navigate]);
 
   const isActive = (path) => location.pathname === path;
 
   const linkClass = (path) =>
-    `w-full flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all duration-150 ${isActive(path)
-      ? "bg-purple-700 text-white"
-      : "text-gray-300 hover:bg-purple-600 hover:text-white"
+    `w-full flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all duration-150 ${
+      isActive(path)
+        ? "bg-red-700 text-white"
+        : "text-gray-300 hover:bg-red-600 hover:text-white"
     }`;
 
   const toggleSection = (section) => {
@@ -40,7 +64,7 @@ const SidebarAdmin = () => {
     <div>
       <button
         onClick={() => toggleSection(basePath)}
-        className="w-full flex items-center justify-between px-4 py-2 rounded-md text-gray-300 hover:bg-purple-600 hover:text-white"
+        className="w-full flex items-center justify-between px-4 py-2 rounded-md text-gray-300 hover:bg-red-600 hover:text-white"
       >
         <span className="flex items-center gap-2">
           {icon}
@@ -68,33 +92,32 @@ const SidebarAdmin = () => {
 
   return (
     <div
-      className={`${isOpen ? "w-64" : "w-16"
-        } bg-[#1E1E2F] text-white flex flex-col p-4 min-h-screen transition-all duration-300 shadow-lg`}
+      className={`${
+        isOpen ? "w-64" : "w-16"
+      } bg-[#1E1E2F] text-white flex flex-col p-4 min-h-screen transition-all duration-300 shadow-lg`}
     >
-      {/* Toggle Icon */}
       <div className="flex items-center justify-start mb-4">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="p-2 rounded-md hover:bg-purple-500"
+          className="p-2 rounded-md hover:bg-red-500"
         >
-          <Bars3Icon className="w-6 h-6 text-purple-500" />
+          <Bars3Icon className="w-6 h-6 text-red-500" />
         </button>
       </div>
 
-      {/* Admin Avatar & Info (only if open) */}
       {isOpen && (
         <div className="flex flex-col items-center mb-6">
           <img
-            src="/admin_avatar.png"
-            alt="Admin Avatar"
-            className="rounded-full w-16 h-16 border-2 border-purple-500 shadow-md"
+            src={`${process.env.PUBLIC_URL}/images/evenements/utilisateur.jpg`}
+            className="rounded-full w-16 h-16 border-2 border-red-500 shadow-md"
           />
-          <h2 className="text-lg font-bold mt-2">Nexx</h2>
-          <p className="text-green-400 text-sm">Awesome Admin</p>
+          <h2 className="text-lg font-bold mt-2">
+            {admin ? `${admin.nom}` : "Admin"}
+          </h2>
+          <p className="text-red-400 text-sm">Administrateur</p>
         </div>
       )}
 
-      {/* Navigation */}
       <nav className="flex-1 space-y-2 text-sm">
         <Link to="/admin" className={linkClass("/admin")}>
           <HomeIcon className="w-5 h-5" />
@@ -102,88 +125,34 @@ const SidebarAdmin = () => {
         </Link>
 
         <Section
-          title="Publications"
-          icon={<UserGroupIcon className="w-5 h-5" />}
-          basePath="publications"
-          routes={[
-            { path: "/admin/publications", label: "Liste", Icon: UserGroupIcon },
-            { path: "/admin/ajouter-publication", label: "Ajouter", Icon: PlusCircleIcon },
-            { path: "/admin/valider-publications", label: "Validation", Icon: CheckBadgeIcon },
-          ]}
-        />
-
-        <Section
-          title="Auteurs"
-          icon={<UserGroupIcon className="w-5 h-5" />}
-          basePath="auteurs"
-          routes={[
-            { path: "/admin/auteurs", label: "Liste", Icon: UserGroupIcon },
-            { path: "/admin/ajouter-auteur", label: "Ajouter", Icon: PlusCircleIcon },
-          ]}
-        />
-
-        <Section
-          title="Chercheurs"
-          icon={<UserGroupIcon className="w-5 h-5" />}
-          basePath="chercheurs"
-          routes={[
-            { path: "/admin/chercheurs", label: "Liste", Icon: UserGroupIcon },
-            { path: "/admin/ajouter-chercheur", label: "Ajouter", Icon: PlusCircleIcon },
-          ]}
-        />
-
-        <Section
-          title="Chapitres"
+          title="Tâches"
           icon={<BookOpenIcon className="w-5 h-5" />}
-          basePath="chapitres"
+          basePath="taches"
           routes={[
-            { path: "/admin/chapitres", label: "Liste", Icon: BookOpenIcon },
-            { path: "/admin/ajouter-chapitre", label: "Ajouter", Icon: PlusCircleIcon },
+            { path: "/admin/publications", label: "Publications", Icon: BookOpenIcon },
+            { path: "/admin/chapitres", label: "Chapitres", Icon: BookOpenIcon },
+            { path: "/admin/livres", label: "Livres", Icon: BookOpenIcon },
+            { path: "/admin/theses", label: "Thèses", Icon: BookOpenIcon },
+            { path: "/admin/ListeEvenements", label: "Événements", Icon: CalendarDaysIcon },
+            { path: "/admin/valider-publications", label: "Valider", Icon: CheckBadgeIcon },
           ]}
         />
 
         <Section
-          title="Livres"
-          icon={<BookOpenIcon className="w-5 h-5" />}
-          basePath="livres"
-          routes={[
-            { path: "/admin/livres", label: "Liste", Icon: BookOpenIcon },
-            { path: "/admin/ajouter-livre", label: "Ajouter", Icon: PlusCircleIcon },
-          ]}
-        />
-
-        <Section
-          title="Thèses"
-          icon={<BookOpenIcon className="w-5 h-5" />}
-          basePath="theses"
-          routes={[
-            { path: "/admin/theses", label: "Liste", Icon: BookOpenIcon },
-            { path: "/admin/ajouter-these", label: "Ajouter", Icon: PlusCircleIcon },
-          ]}
-        />
-
-        <Section
-          title="Directeurs"
+          title="Utilisateurs"
           icon={<UserGroupIcon className="w-5 h-5" />}
-          basePath="directeurs"
+          basePath="users"
           routes={[
-            { path: "/admin/directeurs", label: "Liste", Icon: UserGroupIcon },
-            { path: "/admin/ajouter-directeur", label: "Ajouter", Icon: PlusCircleIcon },
+            { path: "/admin/auteurs", label: "Auteurs", Icon: UserGroupIcon },
+            { path: "/admin/chercheurs", label: "Chercheurs", Icon: UserGroupIcon },
+            { path: "/admin/directeurs", label: "Directeurs", Icon: UserGroupIcon },
           ]}
         />
 
-        <Section
-          title="Événements"
-          icon={<CalendarDaysIcon className="w-5 h-5" />}
-          basePath="evenements"
-          routes={[
-            { path: "admin/ListeEvenements", label: "Liste", Icon: CalendarDaysIcon },
-            { path: "/admin/ajouter-Evenement", label: "Ajouter", Icon: PlusCircleIcon },
-          ]}
-        />
-
-        {/* Déconnexion */}
-        <button onClick={handleLogout} className="mt-10 flex items-center w-full px-4 py-2 text-red-400 hover:text-red-200">
+        <button
+          onClick={handleLogout}
+          className="mt-10 flex items-center w-full px-4 py-2 text-red-400 hover:text-red-200"
+        >
           <ArrowRightOnRectangleIcon className="w-5 h-5 mr-2" />
           {isOpen && <span>Déconnexion</span>}
         </button>

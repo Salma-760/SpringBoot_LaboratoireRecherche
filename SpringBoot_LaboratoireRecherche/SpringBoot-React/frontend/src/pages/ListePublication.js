@@ -100,42 +100,44 @@ const ListePublications = () => {
           {publications.map((pub) => (
             <div
               key={pub.id}
-              className="bg-white rounded-xl shadow-lg p-6 space-y-2 hover:shadow-xl transition"
+              className="bg-white rounded-xl shadow-lg p-6 flex flex-col hover:shadow-xl transition h-full"
             >
-              <h3 className="text-xl font-semibold text-blue-700">{pub.titre}</h3>
-              <p>
-                <span className="font-semibold">Journal:</span> {pub.journal || "-"}
-              </p>
-              <p>
-                <span className="font-semibold">Indexation:</span>{" "}
-                {Array.isArray(pub.baseIndexation)
-                  ? pub.baseIndexation.join(", ")
-                  : pub.baseIndexation || "-"}
-              </p>
-              <p>
-                <span className="font-semibold">Année:</span> {pub.annee || "-"}
-              </p>
-              <p>
-                <span className="font-semibold">Volume:</span> {pub.volume || "-"} |{" "}
-                <span className="font-semibold">Pages:</span> {pub.pages || "-"}
-              </p>
-              <p>
-                <span className="font-semibold">DOI:</span> {pub.doi || "-"}
-              </p>
-              <p>
-                <span className="font-semibold">Résumé:</span> {pub.resume || "-"}
-              </p>
-              <p>
-                <span className="font-semibold">Statut:</span> {pub.statut || "-"}
-              </p>
-              <p>
-                <span className="font-semibold">Auteurs:</span>{" "}
-                {Array.isArray(pub.auteurs)
-                  ? pub.auteurs.map((a) => `${a.prenom} ${a.nom}`).join(", ")
-                  : "-"}
-              </p>
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold text-blue-700">{pub.titre}</h3>
+                <p>
+                  <span className="font-semibold">Journal:</span> {pub.journal || "-"}
+                </p>
+                <p>
+                  <span className="font-semibold">Indexation:</span>{" "}
+                  {Array.isArray(pub.baseIndexation)
+                    ? pub.baseIndexation.join(", ")
+                    : pub.baseIndexation || "-"}
+                </p>
+                <p>
+                  <span className="font-semibold">Année:</span> {pub.annee || "-"}
+                </p>
+                <p>
+                  <span className="font-semibold">Volume:</span> {pub.volume || "-"} |{" "}
+                  <span className="font-semibold">Pages:</span> {pub.pages || "-"}
+                </p>
+                <p>
+                  <span className="font-semibold">DOI:</span> {pub.doi || "-"}
+                </p>
+                <p>
+                  <span className="font-semibold">Résumé:</span> {pub.resume || "-"}
+                </p>
+                <p>
+                  <span className="font-semibold">Statut:</span> {pub.statut || "-"}
+                </p>
+                <p>
+                  <span className="font-semibold">Auteurs:</span>{" "}
+                  {Array.isArray(pub.auteurs)
+                    ? pub.auteurs.map((a) => `${a.prenom} ${a.nom}`).join(", ")
+                    : "-"}
+                </p>
+              </div>
 
-              <div className="flex justify-end gap-2 mt-4">
+              <div className="flex justify-end gap-2 mt-auto pt-4">
                 <button
                   onClick={() => setPublicationToEdit(pub)}
                   className="flex items-center bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm"

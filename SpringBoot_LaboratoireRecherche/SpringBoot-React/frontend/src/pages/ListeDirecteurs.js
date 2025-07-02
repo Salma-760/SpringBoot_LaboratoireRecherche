@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import AjouterDirecteur from "./AjouterDirecteur";
 import EditDirecteur from "./EditDirecteur";
+import {
+  BriefcaseIcon,
+  IdentificationIcon,
+  PencilIcon,
+  TrashIcon,
+} from "@heroicons/react/24/solid";
 
 const ListeDirecteurs = () => {
   const [directeurs, setDirecteurs] = useState([]);
@@ -42,17 +48,20 @@ const ListeDirecteurs = () => {
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Liste des directeurs</h2>
+    <div className="p-6">
+      <h2 className="text-3xl font-bold mb-6 flex items-center gap-3 text-gray-800">
+        <BriefcaseIcon className="w-8 h-8 text-blue-600" />
+        Liste des Directeurs
+      </h2>
 
       {error && <p className="text-red-600 mb-4">{error}</p>}
 
       {!showForm && !directeurToEdit && (
         <button
           onClick={() => setShowForm(true)}
-          className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
+          className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
-          Ajouter un directeur
+          ➕ Ajouter un directeur
         </button>
       )}
 
@@ -77,37 +86,39 @@ const ListeDirecteurs = () => {
         />
       )}
 
-      <table className="w-full border mt-4">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2 border">Nom</th>
-            <th className="p-2 border">Prénom</th>
-            <th className="p-2 border">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {directeurs.map((d) => (
-            <tr key={d.id} className="text-center">
-              <td className="border p-2">{d.nom}</td>
-              <td className="border p-2">{d.prenom}</td>
-              <td className="border p-2 space-x-2">
-                <button
-                  onClick={() => setDirecteurToEdit(d)}
-                  className="bg-yellow-400 px-2 py-1 rounded"
-                >
-                  Modifier
-                </button>
-                <button
-                  onClick={() => handleDelete(d.id)}
-                  className="bg-red-500 text-white px-2 py-1 rounded"
-                >
-                  Supprimer
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="flex flex-wrap gap-6">
+        {directeurs.map((d) => (
+          <div
+            key={d.id}
+            className="w-[340px] bg-white border rounded-lg shadow-md p-5 space-y-3"
+          >
+            <div className="flex items-center gap-3">
+              <IdentificationIcon className="w-7 h-7 text-blue-600" />
+              <div>
+                <p className="text-lg font-semibold text-gray-800">{d.nom}</p>
+                <p className="text-lg font-semibold text-gray-800">{d.prenom}</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => setDirecteurToEdit(d)}
+                className="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-1.5 rounded font-medium flex items-center gap-2"
+              >
+                <PencilIcon className="w-4 h-4" />
+                Modifier
+              </button>
+              <button
+                onClick={() => handleDelete(d.id)}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded font-medium flex items-center gap-2"
+              >
+                <TrashIcon className="w-4 h-4" />
+                Supprimer
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

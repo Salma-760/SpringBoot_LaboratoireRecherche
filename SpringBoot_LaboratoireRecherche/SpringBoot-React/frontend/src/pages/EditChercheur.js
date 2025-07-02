@@ -19,18 +19,32 @@ const EditChercheur = ({ chercheur, onChercheurUpdated, onCancel }) => {
     e.preventDefault();
 
     const updatedChercheur = { nom, prenom, email, specialite };
+    const token = localStorage.getItem("token"); // 🔐 Récupération du token
 
     fetch(`http://localhost:8081/api/chercheurs/${chercheur.id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "", // ✅ Token ajouté ici
+      },
       body: JSON.stringify(updatedChercheur),
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Erreur HTTP : " + res.status);
+        }
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          return res.json();
+        } else {
+          return {};
+        }
+      })
       .then(() => {
         onChercheurUpdated();
         onCancel();
       })
-      .catch((err) => console.error("Erreur :", err));
+      .catch((err) => console.error("Erreur :", err.message));
   };
 
   return (

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
+import AjouterEvenement from "./AjouterEvenement";
 
 const ListeEvenements = () => {
   const [evenements, setEvenements] = useState([]);
+  const [showForm, setShowForm] = useState(false);
   const token = localStorage.getItem("token");
 
   const fetchEvenements = () => {
@@ -40,10 +42,30 @@ const ListeEvenements = () => {
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
       <h1 className="text-2xl font-bold text-center text-blue-800 mb-6">
-      Nos Evenements
+        Nos Événements
       </h1>
 
-      <div className="space-y-4">
+      {/* 🔘 Bouton pour afficher / masquer le formulaire */}
+      <div className="text-center mb-6">
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+        >
+          {showForm ? "Fermer le formulaire" : "➕ Ajouter un événement"}
+        </button>
+      </div>
+
+      {/* ✅ Formulaire visible si showForm est true */}
+      {showForm && (
+        <AjouterEvenement
+          refresh={() => {
+            fetchEvenements();
+            setShowForm(false); // refermer le formulaire après ajout
+          }}
+        />
+      )}
+
+      <div className="space-y-4 mt-6">
         {evenements.map((e) => (
           <div
             key={e.id}

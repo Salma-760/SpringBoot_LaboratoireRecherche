@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
-
 public class JwtFilter extends OncePerRequestFilter {
 
     private final AuthService authService;
@@ -50,12 +49,13 @@ public class JwtFilter extends OncePerRequestFilter {
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = authService.loadUserByUsername(email);
 
-            if (jwtUtil.isTokenValid(jwt)) {
-                String role = jwtUtil.extractRole(jwt); // doit retourner "ADMIN"
+            if (jwtUtil.isTokenValid(jwt, userDetails)) {
+                String role = jwtUtil.extractRole(jwt); // rôle stocké dans le JWT : "CHERCHEUR" ou "ADMIN"
 
-                // 🔴 NE PAS ajouter "ROLE_" ici
+                System.out.println("🔐 Rôle extrait du token : " + role);
+
                 List<GrantedAuthority> authorities = Collections.singletonList(
-                       new SimpleGrantedAuthority( role) // juste "ADMIN"
+                    new SimpleGrantedAuthority(role)
                 );
 
                 UsernamePasswordAuthenticationToken authToken =
@@ -65,6 +65,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
+
 
         filterChain.doFilter(request, response);
     }

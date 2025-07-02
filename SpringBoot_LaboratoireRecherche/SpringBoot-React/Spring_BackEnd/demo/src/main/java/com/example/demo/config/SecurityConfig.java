@@ -21,7 +21,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -41,7 +40,7 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
- 
+
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder) throws Exception {
         AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
@@ -62,7 +61,7 @@ public class SecurityConfig {
 
     @Bean
     public GrantedAuthorityDefaults grantedAuthorityDefaults() {
-        return new GrantedAuthorityDefaults(""); // désactive le préfixe "ROLE_"
+        return new GrantedAuthorityDefaults(""); // supprime le préfixe ROLE_
     }
 
     @Bean
@@ -71,7 +70,12 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
+                // Public access
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/actualites/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/equipe/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/evenements/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/missions/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/auteurs/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/chapitres/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/directeurs/**").permitAll()
@@ -79,15 +83,19 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/livres/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/evenements/**").permitAll()
 
-    
+                // Cas particulier pour les chercheurs
                 .requestMatchers(HttpMethod.POST, "/api/publications/soumettre").hasAnyAuthority("CHERCHEUR", "ADMIN")
-                
-                // Protection API POST/PUT/DELETE uniquement ADMIN
+
+                // Ajout explicite autorisé uniquement aux ADMIN
+                .requestMatchers(HttpMethod.POST, "/api/evenements").hasAuthority("ADMIN")
+
+                // Protection générale ADMIN
                 .requestMatchers(HttpMethod.POST, "/api/**").hasAuthority("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/**").hasAuthority("ADMIN")
                 .requestMatchers(HttpMethod.PATCH, "/api/**").hasAuthority("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/**").hasAuthority("ADMIN")
 
+                // Autres requêtes nécessitent une authentification
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

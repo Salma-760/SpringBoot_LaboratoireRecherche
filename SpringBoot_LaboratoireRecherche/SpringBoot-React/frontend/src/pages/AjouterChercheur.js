@@ -9,21 +9,33 @@ const AjouterChercheur = ({ onChercheurAdded }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const chercheur = { nom, prenom, email, specialite };
+    const token = localStorage.getItem("token");
 
     fetch("http://localhost:8081/api/chercheurs", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
       body: JSON.stringify(chercheur),
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Échec de l'ajout du chercheur");
+        }
+        // Si pas de contenu JSON (HTTP 204), on retourne un objet vide
+        return res.json().catch(() => ({}));
+      })
       .then(() => {
         setNom("");
         setPrenom("");
         setEmail("");
         setSpecialite("");
-        onChercheurAdded();
+        if (typeof onChercheurAdded === "function") {
+          onChercheurAdded(); // 🔁 recharge la liste dans ListeChercheurs
+        }
       })
-      .catch((err) => console.error("Erreur :", err));
+      .catch((err) => console.error("Erreur lors de l'ajout :", err));
   };
 
   return (
@@ -61,7 +73,10 @@ const AjouterChercheur = ({ onChercheurAdded }) => {
         className="w-full p-2 mb-2 border rounded"
         required
       />
-      <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">
+      <button
+        type="submit"
+        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+      >
         Ajouter
       </button>
     </form>

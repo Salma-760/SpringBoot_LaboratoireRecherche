@@ -1,15 +1,26 @@
 import React, { useEffect, useState } from "react";
 import AjouterChercheur from "./AjouterChercheur";
 import EditChercheur from "./EditChercheur";
+import { UserIcon, EnvelopeIcon, WrenchScrewdriverIcon } from "@heroicons/react/24/solid";
 
 const ListeChercheurs = () => {
   const [chercheurs, setChercheurs] = useState([]);
   const [chercheurToEdit, setChercheurToEdit] = useState(null);
   const [showFormAjout, setShowFormAjout] = useState(false);
 
+  const token = localStorage.getItem("token");
+
   const fetchChercheurs = () => {
-    fetch("http://localhost:8081/api/chercheurs")
-      .then((res) => res.json())
+    fetch("http://localhost:8081/api/chercheurs", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Erreur de chargement des chercheurs");
+        return res.json();
+      })
       .then((data) => setChercheurs(data))
       .catch((err) => console.error("Erreur chargement chercheurs :", err));
   };
@@ -21,6 +32,9 @@ const ListeChercheurs = () => {
   const deleteChercheur = (id) => {
     fetch(`http://localhost:8081/api/chercheurs/${id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
     })
       .then(() => fetchChercheurs())
       .catch((err) => console.error("Erreur suppression :", err));
@@ -41,10 +55,10 @@ const ListeChercheurs = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-6">
       <button
         onClick={handleAddClick}
-        className="mb-4 bg-blue-500 text-white px-4 py-2 rounded"
+        className="mb-4 bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
       >
         {showFormAjout ? "Fermer le formulaire" : "➕ Ajouter un chercheur"}
       </button>
@@ -69,34 +83,52 @@ const ListeChercheurs = () => {
         />
       )}
 
-      <h2 className="text-2xl mt-6 mb-3">Liste des chercheurs</h2>
-      <ul className="space-y-2">
+      <h2 className="text-3xl font-bold mb-6 flex items-center gap-2">
+        <UserIcon className="w-8 h-8 text-red-600" />
+        Liste des Chercheurs
+      </h2>
+
+      <div className="flex flex-wrap gap-6">
         {chercheurs.map((c) => (
-          <li
+          <div
             key={c.id}
-            className="flex justify-between items-center bg-white p-3 border rounded shadow"
+            className="w-[340px] bg-white border rounded-lg shadow-md p-5 space-y-3"
           >
-            <div>
-              <strong>{c.nom} {c.prenom}</strong><br />
-              {c.email} | {c.specialite}
+            <div className="flex items-center gap-3">
+              <UserIcon className="w-7 h-7 text-red-600" />
+              <div>
+                <p className="text-lg font-semibold text-gray-800">{c.nom}</p>
+                <p className="text-lg font-semibold text-gray-800">{c.prenom}</p>
+              </div>
             </div>
-            <div className="flex gap-2">
+
+            <div className="flex items-center gap-2">
+              <EnvelopeIcon className="w-6 h-6 text-gray-600" />
+              <p className="text-sm text-gray-700">{c.email}</p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <WrenchScrewdriverIcon className="w-6 h-6 text-teal-600" />
+              <p className="text-sm text-gray-700 font-medium">{c.specialite}</p>
+            </div>
+
+            <div className="flex gap-3 pt-2">
               <button
                 onClick={() => handleEdit(c)}
-                className="bg-yellow-400 text-black px-3 py-1 rounded"
+                className="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-1.5 rounded font-medium flex items-center gap-2"
               >
-                Modifier
+                ✏️ Modifier
               </button>
               <button
                 onClick={() => deleteChercheur(c.id)}
-                className="bg-red-500 text-white px-3 py-1 rounded"
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded font-medium flex items-center gap-2"
               >
-                Supprimer
+                🗑️ Supprimer
               </button>
             </div>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
