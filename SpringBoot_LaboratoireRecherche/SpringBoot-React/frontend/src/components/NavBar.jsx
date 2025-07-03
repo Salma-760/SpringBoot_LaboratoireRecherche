@@ -17,23 +17,10 @@ const menuItems = {
     { name: "Publications", link: "/recherche/publication" },
   ],
   "Publications": [
-    { name: "Articles récents", link: "/articles" },
-    { name: "Revues scientifiques", link: "/revues" },
+    
     { name: "Publications", link: "/publication" },
   ],
-  "Formation": [
-    { name: "Cours en ligne", link: "/cours" },
-    { name: "Ateliers", link: "/ateliers" },
-    { name: "Ajouter étudiant", link: "/ajouteretudiant" },
-  ],
-  "Emplois": [
-    { name: "Offres d'emploi", link: "/offres" },
-    { name: "Stages", link: "/stages" },
-  ],
-  "Esai": [
-    { name: "Crud Publications", link: "/crudpublication" },
-    { name: "Liste Publications", link: "/listepublication" },
-  ],
+  
 };
 
 const menuColors = {

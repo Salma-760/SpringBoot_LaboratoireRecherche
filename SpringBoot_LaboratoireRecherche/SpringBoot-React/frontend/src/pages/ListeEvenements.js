@@ -40,16 +40,12 @@ const ListeEvenements = () => {
   }, []);
 
   return (
-    <div className="p-4 bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-bold text-center text-blue-800 mb-6">
-        Nos Événements
-      </h1>
-
+    <div className="p-6 bg-gray-50 min-h-screen">
       {/* 🔘 Bouton pour afficher / masquer le formulaire */}
       <div className="text-center mb-6">
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+          className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition"
         >
           {showForm ? "Fermer le formulaire" : "➕ Ajouter un événement"}
         </button>
@@ -57,15 +53,23 @@ const ListeEvenements = () => {
 
       {/* ✅ Formulaire visible si showForm est true */}
       {showForm && (
-        <AjouterEvenement
-          refresh={() => {
-            fetchEvenements();
-            setShowForm(false); // refermer le formulaire après ajout
-          }}
-        />
+        <div className="bg-white p-6 rounded shadow mb-8">
+          <h2 className="text-lg font-semibold mb-4 text-gray-800">Ajouter un événement</h2>
+          <AjouterEvenement
+            refresh={() => {
+              fetchEvenements();
+              setShowForm(false);
+            }}
+          />
+        </div>
       )}
 
-      <div className="space-y-4 mt-6">
+      {/* ✅ Titre après le formulaire */}
+      <h1 className="text-2xl font-bold text-center text-blue-800 mb-8">
+        Nos Événements
+      </h1>
+
+      <div className="space-y-4">
         {evenements.map((e) => (
           <div
             key={e.id}

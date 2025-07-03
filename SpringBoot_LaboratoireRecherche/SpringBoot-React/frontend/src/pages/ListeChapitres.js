@@ -24,12 +24,7 @@ const ListeChapitres = () => {
         return res.json();
       })
       .then((data) => {
-        console.log("✅ Données reçues des chapitres :", data); // 🔍 log global
         if (Array.isArray(data)) {
-          data.forEach((chap, index) => {
-            console.log(`➡️ Chapitre ${index + 1} :`, chap);
-            console.log(`   Auteurs :`, chap.auteurs); // 🔍 log des auteurs
-          });
           setChapitres(data);
           setError(null);
         } else {
@@ -38,8 +33,8 @@ const ListeChapitres = () => {
         }
       })
       .catch((err) => {
-        console.error("❌ Erreur lors de la récupération des chapitres :", err);
-        setError("Impossible de charger les chapitres. Vérifiez votre connexion ou authentification.");
+        console.error("❌ Erreur :", err);
+        setError("Impossible de charger les chapitres.");
         setChapitres([]);
       });
   };
@@ -59,13 +54,11 @@ const ListeChapitres = () => {
       },
     })
       .then((res) => {
-        if (!res.ok) {
-          throw new Error(`Erreur HTTP suppression ${res.status}`);
-        }
+        if (!res.ok) throw new Error(`Erreur HTTP suppression ${res.status}`);
         fetchChapitres();
       })
       .catch((err) => {
-        alert("Erreur lors de la suppression, voir la console.");
+        alert("Erreur lors de la suppression.");
         console.error("❌ Erreur suppression chapitre :", err);
       });
   };
@@ -81,8 +74,7 @@ const ListeChapitres = () => {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Liste des chapitres</h2>
-
+      {/* Bouton Ajouter */}
       {!chapitreToEdit && (
         <button
           onClick={() => setShowForm(!showForm)}
@@ -94,9 +86,9 @@ const ListeChapitres = () => {
 
       {error && <p className="text-red-600 mb-4">{error}</p>}
 
+      {/* Formulaire Ajouter */}
       {showForm && (
-        <div className="bg-gray-50 p-4 rounded shadow mb-4">
-          <h3 className="text-lg font-semibold mb-2">Ajouter un chapitre</h3>
+        <div className="bg-blue-50 p-4 rounded shadow mb-6">
           <AjouterChapitre
             onChapitreAdded={() => {
               fetchChapitres();
@@ -106,17 +98,24 @@ const ListeChapitres = () => {
         </div>
       )}
 
+      {/* Formulaire Modifier */}
       {chapitreToEdit && (
-        <EditChapitre
-          chapitre={chapitreToEdit}
-          onChapitreUpdated={() => {
-            fetchChapitres();
-            setChapitreToEdit(null);
-          }}
-          onCancel={handleCancelEdit}
-        />
+        <div className="bg-yellow-50 p-4 rounded shadow mb-6">
+          <EditChapitre
+            chapitre={chapitreToEdit}
+            onChapitreUpdated={() => {
+              fetchChapitres();
+              setChapitreToEdit(null);
+            }}
+            onCancel={handleCancelEdit}
+          />
+        </div>
       )}
 
+      {/* ✅ Titre déplacé ici */}
+      <h2 className="text-2xl font-bold mb-4">Liste des chapitres</h2>
+
+      {/* Tableau des chapitres */}
       <table className="table-auto w-full border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-200">
@@ -142,11 +141,12 @@ const ListeChapitres = () => {
                 {c.pageDebut || 0} à {c.pageFin || 0}
               </td>
               <td className="border p-2 text-sm">
-                {/* 🔍 log individuel si nécessaire */}
                 {Array.isArray(c.auteurs) && c.auteurs.length > 0
-                  ? c.auteurs.map((a, i) =>
-                      a ? `${a.nom || ""} ${a.prenom || ""}` : "Auteur inconnu"
-                    ).join(", ")
+                  ? c.auteurs
+                      .map((a) =>
+                        a ? `${a.nom || ""} ${a.prenom || ""}` : "Auteur inconnu"
+                      )
+                      .join(", ")
                   : "Aucun auteur"}
               </td>
               <td className="border p-2 flex gap-2">

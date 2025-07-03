@@ -5,7 +5,7 @@ import ModifierLivre from "./EditLivre";
 const ListeLivres = () => {
   const [livres, setLivres] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
-  const [livreToEdit, setLivreToEdit] = useState(null); // Pour édition
+  const [livreToEdit, setLivreToEdit] = useState(null);
 
   const fetchLivres = () => {
     const token = localStorage.getItem("token");
@@ -47,29 +47,41 @@ const ListeLivres = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Liste des Livres</h1>
+      {/* 👉 Formulaire Ajouter ou Modifier */}
+      {isAdding && (
+        <div className="bg-blue-50 p-4 rounded shadow mb-6">
+          <AjouterLivre
+            onLivreAdded={handleLivreAdded}
+            onCancel={() => setIsAdding(false)}
+          />
+        </div>
+      )}
 
-      {isAdding ? (
-        <AjouterLivre
-          onLivreAdded={handleLivreAdded}
-          onCancel={() => setIsAdding(false)}
-        />
-      ) : livreToEdit ? (
-        <ModifierLivre
-          livre={livreToEdit}
-          onCancel={() => setLivreToEdit(null)}
-          onLivreUpdated={handleLivreUpdated}
-        />
-      ) : (
+      {livreToEdit && (
+        <div className="bg-yellow-50 p-4 rounded shadow mb-6">
+          <ModifierLivre
+            livre={livreToEdit}
+            onCancel={() => setLivreToEdit(null)}
+            onLivreUpdated={handleLivreUpdated}
+          />
+        </div>
+      )}
+
+      {/* 👉 Bouton ajouter (si aucun formulaire affiché) */}
+      {!isAdding && !livreToEdit && (
         <button
           onClick={() => setIsAdding(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           Ajouter un livre
         </button>
       )}
 
-      <div className="mt-6 space-y-4">
+      {/* ✅ Titre placé après formulaire */}
+      <h1 className="text-2xl font-bold mb-4">Liste des Livres</h1>
+
+      {/* 📚 Liste des livres */}
+      <div className="space-y-4">
         {livres.map((livre) => {
           const auteurs = livre.auteursDTO || [];
 
@@ -80,19 +92,19 @@ const ListeLivres = () => {
               <p><strong>Année de parution :</strong> {livre.anneeParution}</p>
               <p><strong>ISBN :</strong> {livre.isbn}</p>
               <p><strong>Auteurs :</strong> {auteurs.length > 0
-                  ? auteurs.map((a) => `${a.prenom} ${a.nom}`).join(", ")
-                  : "Aucun"}</p>
+                ? auteurs.map((a) => `${a.prenom} ${a.nom}`).join(", ")
+                : "Aucun"}</p>
 
               <div className="flex gap-2 mt-2">
                 <button
                   onClick={() => setLivreToEdit(livre)}
-                  className="bg-yellow-500 text-white px-3 py-1 rounded"
+                  className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
                 >
                   Modifier
                 </button>
                 <button
                   onClick={() => handleLivreDeleted(livre.id)}
-                  className="bg-red-600 text-white px-3 py-1 rounded"
+                  className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
                 >
                   Supprimer
                 </button>

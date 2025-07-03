@@ -1,23 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { TrashIcon, PencilSquareIcon } from "@heroicons/react/24/solid";
-import AjouterPublication from "./AjouterPublication";
-import EditPublication from "./ModifierPublication";
 
-const ListePublications = () => {
+const ListePublicationPubliques = () => {
   const [publications, setPublications] = useState([]);
-  const [auteurs, setAuteurs] = useState([]);
-  const [publicationToEdit, setPublicationToEdit] = useState(null);
-  const [isAdding, setIsAdding] = useState(false);
-
-  const token = localStorage.getItem("token");
-
-  const headers = {
-    Authorization: "Bearer " + token,
-    "Content-Type": "application/json",
-  };
 
   const fetchPublications = () => {
-    fetch("http://localhost:8081/api/publications", { headers })
+    fetch("http://localhost:8081/api/publications")
       .then((res) => {
         if (!res.ok) throw new Error("Erreur HTTP " + res.status);
         return res.json();
@@ -26,77 +13,24 @@ const ListePublications = () => {
       .catch((err) => console.error("Erreur fetchPublications:", err.message));
   };
 
-  const fetchAuteurs = () => {
-    fetch("http://localhost:8081/api/auteurs", { headers })
-      .then((res) => {
-        if (!res.ok) throw new Error("Erreur HTTP " + res.status);
-        return res.json();
-      })
-      .then((data) => (Array.isArray(data) ? setAuteurs(data) : setAuteurs([])))
-      .catch((err) => console.error("Erreur fetchAuteurs:", err.message));
-  };
-
   useEffect(() => {
     fetchPublications();
-    fetchAuteurs();
   }, []);
-
-  const handleDelete = (id) => {
-    if (!window.confirm("Voulez-vous vraiment supprimer cette publication ?")) return;
-
-    fetch(`http://localhost:8081/api/publications/${id}`, {
-      method: "DELETE",
-      headers,
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Erreur suppression : " + res.status);
-        setPublications((prev) => prev.filter((p) => p.id !== id));
-      })
-      .catch((err) => alert(err.message));
-  };
-
-  const handleSave = () => {
-    setPublicationToEdit(null);
-    setIsAdding(false);
-    fetchPublications();
-  };
 
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-800">Liste des Publications</h2>
-          {!isAdding && !publicationToEdit && (
-            <button
-              onClick={() => setIsAdding(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow"
-            >
-              Ajouter une publication
-            </button>
-          )}
-        </div>
-
-        {isAdding && (
-          <AjouterPublication
-            auteursDisponibles={auteurs}
-            onCancel={() => setIsAdding(false)}
-            onSave={handleSave}
-          />
-        )}
-
-        {publicationToEdit && (
-          <EditPublication
-            publication={publicationToEdit}
-            auteursDisponibles={auteurs}
-            onCancel={() => setPublicationToEdit(null)}
-            onSave={handleSave}
-          />
-        )}
+        <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+          Liste des Publications
+        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {publications.length === 0 && (
-            <p className="text-center text-gray-500 col-span-full">Aucune publication trouvée.</p>
+            <p className="text-center text-gray-500 col-span-full">
+              Aucune publication trouvée.
+            </p>
           )}
+
           {publications.map((pub) => (
             <div
               key={pub.id}
@@ -104,54 +38,14 @@ const ListePublications = () => {
             >
               <div className="space-y-2">
                 <h3 className="text-xl font-semibold text-blue-700">{pub.titre}</h3>
-                <p>
-                  <span className="font-semibold">Journal:</span> {pub.journal || "-"}
-                </p>
-                <p>
-                  <span className="font-semibold">Indexation:</span>{" "}
-                  {Array.isArray(pub.baseIndexation)
-                    ? pub.baseIndexation.join(", ")
-                    : pub.baseIndexation || "-"}
-                </p>
-                <p>
-                  <span className="font-semibold">Année:</span> {pub.annee || "-"}
-                </p>
-                <p>
-                  <span className="font-semibold">Volume:</span> {pub.volume || "-"} |{" "}
-                  <span className="font-semibold">Pages:</span> {pub.pages || "-"}
-                </p>
-                <p>
-                  <span className="font-semibold">DOI:</span> {pub.doi || "-"}
-                </p>
-                <p>
-                  <span className="font-semibold">Résumé:</span> {pub.resume || "-"}
-                </p>
-                <p>
-                  <span className="font-semibold">Statut:</span> {pub.statut || "-"}
-                </p>
-                <p>
-                  <span className="font-semibold">Auteurs:</span>{" "}
-                  {Array.isArray(pub.auteurs)
-                    ? pub.auteurs.map((a) => `${a.prenom} ${a.nom}`).join(", ")
-                    : "-"}
-                </p>
-              </div>
-
-              <div className="flex justify-end gap-2 mt-auto pt-4">
-                <button
-                  onClick={() => setPublicationToEdit(pub)}
-                  className="flex items-center bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm"
-                >
-                  <PencilSquareIcon className="w-4 h-4 mr-1" />
-                  Modifier
-                </button>
-                <button
-                  onClick={() => handleDelete(pub.id)}
-                  className="flex items-center bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm"
-                >
-                  <TrashIcon className="w-4 h-4 mr-1" />
-                  Supprimer
-                </button>
+                <p><span className="font-semibold">Journal:</span> {pub.journal || "-"}</p>
+                <p><span className="font-semibold">Indexation:</span> {Array.isArray(pub.baseIndexation) ? pub.baseIndexation.join(", ") : pub.baseIndexation || "-"}</p>
+                <p><span className="font-semibold">Année:</span> {pub.annee || "-"}</p>
+                <p><span className="font-semibold">Volume:</span> {pub.volume || "-"} | <span className="font-semibold">Pages:</span> {pub.pages || "-"}</p>
+                <p><span className="font-semibold">DOI:</span> {pub.doi || "-"}</p>
+                <p><span className="font-semibold">Résumé:</span> {pub.resume || "-"}</p>
+                <p><span className="font-semibold">Statut:</span> {pub.statut || "-"}</p>
+                <p><span className="font-semibold">Auteurs:</span> {Array.isArray(pub.auteurs) ? pub.auteurs.map((a) => `${a.prenom} ${a.nom}`).join(", ") : "-"}</p>
               </div>
             </div>
           ))}
@@ -161,4 +55,4 @@ const ListePublications = () => {
   );
 };
 
-export default ListePublications;
+export default ListePublicationPubliques;

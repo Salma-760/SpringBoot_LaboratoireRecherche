@@ -8,10 +8,10 @@ const EditChercheur = ({ chercheur, onChercheurUpdated, onCancel }) => {
 
   useEffect(() => {
     if (chercheur) {
-      setNom(chercheur.nom);
-      setPrenom(chercheur.prenom);
-      setEmail(chercheur.email);
-      setSpecialite(chercheur.specialite);
+      setNom(chercheur.nom || "");
+      setPrenom(chercheur.prenom || "");
+      setEmail(chercheur.email || "");
+      setSpecialite(chercheur.specialite || "");
     }
   }, [chercheur]);
 
@@ -19,70 +19,82 @@ const EditChercheur = ({ chercheur, onChercheurUpdated, onCancel }) => {
     e.preventDefault();
 
     const updatedChercheur = { nom, prenom, email, specialite };
-    const token = localStorage.getItem("token"); // 🔐 Récupération du token
+
+    const token = localStorage.getItem("token");
 
     fetch(`http://localhost:8081/api/chercheurs/${chercheur.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "", // ✅ Token ajouté ici
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(updatedChercheur),
     })
       .then((res) => {
         if (!res.ok) {
-          throw new Error("Erreur HTTP : " + res.status);
+          throw new Error(`Erreur HTTP ${res.status}`);
         }
-        const contentType = res.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          return res.json();
-        } else {
-          return {};
-        }
+        return res.json();
       })
       .then(() => {
         onChercheurUpdated();
         onCancel();
       })
-      .catch((err) => console.error("Erreur :", err.message));
+      .catch((err) => {
+        console.error("❌ Erreur update chercheur :", err);
+        alert("Erreur lors de la modification du chercheur.");
+      });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-yellow-100 p-4 rounded shadow">
-      <h2 className="text-xl font-bold mb-2">Modifier le chercheur</h2>
+    <form onSubmit={handleSubmit} className="bg-yellow-100 p-6 rounded shadow max-w-md mx-auto">
+      <h2 className="text-xl font-bold mb-4 text-yellow-800 text-center">
+        Modifier un chercheur
+      </h2>
       <input
         type="text"
         value={nom}
         onChange={(e) => setNom(e.target.value)}
-        className="w-full p-2 mb-2 border rounded"
+        placeholder="Nom"
+        className="w-full p-2 mb-3 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400"
         required
       />
       <input
         type="text"
         value={prenom}
         onChange={(e) => setPrenom(e.target.value)}
-        className="w-full p-2 mb-2 border rounded"
+        placeholder="Prénom"
+        className="w-full p-2 mb-3 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400"
         required
       />
       <input
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="w-full p-2 mb-2 border rounded"
+        placeholder="Email"
+        className="w-full p-2 mb-3 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400"
         required
       />
       <input
         type="text"
         value={specialite}
         onChange={(e) => setSpecialite(e.target.value)}
-        className="w-full p-2 mb-2 border rounded"
+        placeholder="Spécialité"
+        className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400"
         required
       />
-      <div className="flex gap-2">
-        <button type="submit" className="bg-yellow-600 text-white px-4 py-2 rounded">
+      <div className="flex justify-between gap-4">
+        <button
+          type="submit"
+          className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded w-full"
+        >
           Enregistrer
         </button>
-        <button onClick={onCancel} type="button" className="bg-gray-500 text-white px-4 py-2 rounded">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded w-full"
+        >
           Annuler
         </button>
       </div>

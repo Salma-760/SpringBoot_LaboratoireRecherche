@@ -80,22 +80,9 @@ const ListeTheses = () => {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Liste des thèses</h2>
-
-      {!theseToEdit && (
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          {showForm ? "Fermer le formulaire" : "Ajouter une thèse"}
-        </button>
-      )}
-
-      {error && <p className="text-red-600 mb-4">{error}</p>}
-
-      {showForm && (
-        <div className="bg-gray-50 p-4 rounded shadow mb-4">
-          <h3 className="text-lg font-semibold mb-2">Ajouter une thèse</h3>
+      {/* 🟦 Formulaire Ajouter */}
+      {showForm && !theseToEdit && (
+        <div className="bg-blue-50 p-4 rounded shadow mb-6">
           <AjouterThese
             onTheseAdded={() => {
               fetchTheses();
@@ -106,17 +93,36 @@ const ListeTheses = () => {
         </div>
       )}
 
+      {/* 🟨 Formulaire Modifier */}
       {theseToEdit && (
-        <EditThese
-          these={theseToEdit}
-          onTheseUpdated={() => {
-            fetchTheses();
-            setTheseToEdit(null);
-          }}
-          onCancel={handleCancelEdit}
-        />
+        <div className="bg-yellow-50 p-4 rounded shadow mb-6">
+          <EditThese
+            these={theseToEdit}
+            onTheseUpdated={() => {
+              fetchTheses();
+              setTheseToEdit(null);
+            }}
+            onCancel={handleCancelEdit}
+          />
+        </div>
       )}
 
+      {/* ✅ Bouton Ajouter si aucun formulaire actif */}
+      {!theseToEdit && !showForm && (
+        <button
+          onClick={() => setShowForm(true)}
+          className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Ajouter une thèse
+        </button>
+      )}
+
+      {/* ✅ Titre après formulaire */}
+      <h2 className="text-2xl font-bold mb-4">Liste des thèses</h2>
+
+      {error && <p className="text-red-600 mb-4">{error}</p>}
+
+      {/* 🧾 Tableau des thèses */}
       <table className="table-auto w-full border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-200">
@@ -132,7 +138,9 @@ const ListeTheses = () => {
         <tbody>
           {theses.map((t, index) => (
             <tr key={t.id || index} className="bg-white text-center">
-              <td className="border p-2">{t.nomDoctorant} {t.prenomDoctorant}</td>
+              <td className="border p-2">
+                {t.nomDoctorant} {t.prenomDoctorant}
+              </td>
               <td className="border p-2">{t.titreThese}</td>
               <td className="border p-2">{t.specialite}</td>
               <td className="border p-2">{t.anneeUniversitaire}</td>
